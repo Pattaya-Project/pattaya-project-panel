@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QMainWindow,QMessageBox,QTableView
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt,QModelIndex
+from PySide6.QtWidgets import QApplication, QMainWindow,QMessageBox,QTableView,QMenu
+from PySide6.QtGui import QIcon,QAction
 from core.info import PATTAYA_PANEL_VERSION
 from designer.ui_main_window import Ui_MainWindow
 from model.bot_table_model import BotTableModel
@@ -40,6 +40,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.socket_io_client.panel_received_online_bot_data.connect(self.update_online_bot)
 
+        # Create a context menu with an action to print the selected row data
+        self.context_menu = QMenu(self.bot_table_view)
+
+        self.action_ping_bot = QAction("Ping", self.context_menu)
+        self.action_ping_bot.setIcon(QIcon(":/assets/images/cross.png"))
+        self.action_ping_bot.triggered.connect(self.ping_bot)
+        self.context_menu.addAction(self.action_ping_bot)
+
+
+        # Connect the context menu to the table widget
+        self.bot_table_view.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.bot_table_view.customContextMenuRequested.connect(lambda pos:  self.context_menu.exec(self.bot_table_view.mapToGlobal(pos)))
+
 
     def app_exit(self):
         self.app.exit()
@@ -60,3 +73,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update_online_bot(self, data):
         self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(data))
         self.setWindowTitle(self.update_title)
+
+
+    def ping_bot(self):
+        item = self.pick_bot()
+        print(item['wanIp'])
+
+
+    def pick_bot(self):
+        # Get the currently selected model item data
+        selected_indexes = self.bot_table_view.selectionModel().selectedIndexes()
+        if selected_indexes:
+            selected_index = selected_indexes[0]
+            data = selected_index.data()
+            item = self.bots_table_model.internal_data[int(data)-1]
+            return item
+        else:
+            return None

