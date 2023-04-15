@@ -8,7 +8,7 @@ class BotTableModel(QAbstractTableModel):
         super().__init__(parent)
         self.internal_data = []
         self._socket_io_client = socket_io_client
-        self._header = ["id", "socketId", "wanIp", "lanIp", "os", "username", "hostname", "country", "lastSeen", "hwid", "online"]
+        self._header = ["id", "socketId", "wanIp", "lanIp", "os", "username", "hostname", "processName", "processId", "architecture", "integrity", "country", "lastSeen", "hwid"]
 
         self._socket_io_client.panel_received_bot_data.connect(self.refresh)
 
@@ -24,7 +24,9 @@ class BotTableModel(QAbstractTableModel):
         row = index.row()
         col = index.column()
         if role == Qt.DisplayRole:
-            if col == 8:
+            if col == 0:
+                return str(row)
+            if col == 12:
                 iso_date_string = str(self.internal_data[row][self._header[col]])
                 iso_date = datetime.datetime.fromisoformat(iso_date_string)
                 new_format = iso_date.strftime("%Y-%m-%d %H:%M:%S")
@@ -36,16 +38,19 @@ class BotTableModel(QAbstractTableModel):
         if( role == Qt.DisplayRole):
             if(orientation == Qt.Horizontal):
                 if(section == 0) : return "ID"
-                if(section == 1) : return "SocketID"
-                if(section == 2) : return "WAN-IP"
-                if(section == 3) : return "LAN-IP"
+                if(section == 1) : return "Socket ID"
+                if(section == 2) : return "WAN IP"
+                if(section == 3) : return "LAN IP"
                 if(section == 4) : return "OS"
                 if(section == 5) : return "USERNAME"
                 if(section == 6) : return "HOSTNAME"
-                if(section == 7) : return "COUNTRY"
-                if(section == 8) : return "LAST SEEN"
-                if(section == 9) : return "HWID"
-                if(section == 10) : return "ONLINE"
+                if(section == 7) : return "PROCESS NAME"
+                if(section == 8) : return "PROCESS ID"
+                if(section == 9) : return "ARCHITECTURE"
+                if(section == 10) : return "INTEGRITY"
+                if(section == 11) : return "COUNTRY"
+                if(section == 12) : return "LAST SEEN"
+                if(section == 13) : return "HWID"
         # return super().headerData(section, orientation, role)
     
     def refresh(self, data):

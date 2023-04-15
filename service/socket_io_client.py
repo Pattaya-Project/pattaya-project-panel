@@ -2,6 +2,8 @@ from PySide6.QtCore import QObject, Signal
 import socketio
 import json
 
+from core.util import PattayaPanelUtil
+
 
 class SocketIOClient(QObject):
     # define a custom signal that receives data from Socket.IO
@@ -21,11 +23,21 @@ class SocketIOClient(QObject):
         self.socket_io.on('panel_received_online_bot_data', self._panel_received_online_bot_data)
 
     def start(self):
-        self.socket_io.connect(self.url, namespaces=self.namespace)
+        try:
+            self.socket_io.connect(self.url, namespaces=self.namespace)
+            PattayaPanelUtil.panel_log_info("Panel has been connect to Pattaya server!")
+        except Exception as e:
+            PattayaPanelUtil.panel_log_error(f'{str(e)}')
+
+        
         self.socket_io.emit("panel_request_bot_data")
 
     def stop(self):
-        self.socket_io.disconnect()
+        try:
+            self.socket_io.disconnect()
+            PattayaPanelUtil.panel_log_info("Panel has been disconnect to Pattaya server!")
+        except Exception as e:
+            PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
     def _on_connect(self):
         print('Connected to Socket.IO server.')
@@ -39,6 +51,7 @@ class SocketIOClient(QObject):
 
     def _panel_received_bot_data(self, data):
        self.panel_received_bot_data.emit(data['data'])
+       PattayaPanelUtil.panel_log_info(f"Server emit bot data to panel: {str(len(data['data']))} bots")
 
     def  _panel_received_online_bot_data(self, data):
         self.panel_received_online_bot_data.emit(data['data'])
