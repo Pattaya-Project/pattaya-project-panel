@@ -7,9 +7,12 @@ from core.util import PattayaPanelUtil
 
 class SocketIOClient(QObject):
     # define a custom signal that receives data from Socket.IO
-    received_data = Signal(str)
     panel_received_bot_data = Signal(dict)
-    panel_received_online_bot_data = Signal(int)
+    panel_received_bot_count_data = Signal(int)
+
+    connected_to_server = Signal()
+    disconnected_to_server = Signal()
+    panel_received_server_heartbeat = Signal(str)
 
     def __init__(self, url, namespace):
         super().__init__()
@@ -18,14 +21,15 @@ class SocketIOClient(QObject):
         self.socket_io = socketio.Client()
         self.socket_io.on('connect', self._on_connect)
         self.socket_io.on('disconnect', self._on_disconnect)
-        self.socket_io.on('data', self._on_data)
         self.socket_io.on('panel_received_bot_data', self._panel_received_bot_data)
-        self.socket_io.on('panel_received_online_bot_data', self._panel_received_online_bot_data)
+        self.socket_io.on('panel_received_server_heartbeat', self._panel_received_server_heartbeat)
+
 
     def start(self):
         try:
             self.socket_io.connect(self.url, namespaces=self.namespace)
             PattayaPanelUtil.panel_log_info("Panel has been connect to Pattaya server!")
+            self.connected_to_server.emit()
         except Exception as e:
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
@@ -36,26 +40,24 @@ class SocketIOClient(QObject):
         try:
             self.socket_io.disconnect()
             PattayaPanelUtil.panel_log_info("Panel has been disconnect to Pattaya server!")
+            self.disconnected_to_server.emit()
         except Exception as e:
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
     def _on_connect(self):
-        print('Connected to Socket.IO server.')
+        PattayaPanelUtil.panel_log_info('Connected to Socket.IO server.')
 
     def _on_disconnect(self):
-        print('Disconnected from Socket.IO server.')
-
-    def _on_data(self, data):
-        print(f'Received data: {data}')
-        self.received_data.emit(data)
+        self.panel_received_bot_count_data.emit(0)
+        PattayaPanelUtil.panel_log_info('Disconnected from Socket.IO server.')
 
     def _panel_received_bot_data(self, data):
        self.panel_received_bot_data.emit(data['data'])
+       self.panel_received_bot_count_data.emit(len(data['data']))
        PattayaPanelUtil.panel_log_info(f"Server emit bot data to panel: {str(len(data['data']))} bots")
-
-    def  _panel_received_online_bot_data(self, data):
-        self.panel_received_online_bot_data.emit(data['data'])
         
 
+    def _panel_received_server_heartbeat(self, data):
+        PattayaPanelUtil.server_log_info(f"Server hearthbeat: {data['message']}")
 
 

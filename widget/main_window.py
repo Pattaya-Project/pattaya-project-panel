@@ -24,7 +24,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.about_dialog = AboutWidget()
         
-        PattayaPanelUtil.setup(self.panel_log_text_browser)
+        PattayaPanelUtil.setup(self.panel_log_text_browser, self.server_log_text_browser)
         self.socket_io_client = socket_io_client
         self.bot_table_view.setShowGrid(False)
 
@@ -32,6 +32,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.bot_table_view.setSelectionBehavior(QTableView.SelectRows)
         self.bot_table_view.setSelectionMode(QTableView.SingleSelection)
         self.bot_table_view.setModel(self.bots_table_model)
+        self.bot_table_view.setAlternatingRowColors(True)
+
 
         self.actionExit.triggered.connect(self.app_exit)
         self.actionDark.triggered.connect(self.enable_dark_theme)
@@ -42,7 +44,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionStart.triggered.connect(self.start)
         self.actionStop.triggered.connect(self.stop)
 
-        self.socket_io_client.panel_received_online_bot_data.connect(self.update_online_bot)
+        self.actionStop.setDisabled(True)
+
+        self.socket_io_client.connected_to_server.connect(self.disable_start_action)
+        self.socket_io_client.disconnected_to_server.connect(self.disable_stop_action)
+
+
+        self.socket_io_client.panel_received_bot_count_data.connect(self.update_online_bot)
 
         # Create a context menu with an action to print the selected row data
         self.context_menu = QMenu(self.bot_table_view)
@@ -104,3 +112,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def stop(self):
         self.socket_io_client.stop()
         self.bots_table_model.refresh([])
+    
+
+    def disable_start_action(self):
+        self.actionStart.setDisabled(True)
+        self.actionStop.setDisabled(False)
+
+
+
+    def disable_stop_action(self):
+        self.actionStart.setDisabled(False)
+        self.actionStop.setDisabled(True)
