@@ -21,6 +21,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.old_title = self.windowTitle()
         self.update_title = self.old_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(0))
         self.setWindowTitle(self.update_title)
+        self.setMaximumSize(16777215, 16777215)
 
         self.about_dialog = AboutWidget()
         
