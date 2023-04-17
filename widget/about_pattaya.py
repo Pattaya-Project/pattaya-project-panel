@@ -13,6 +13,11 @@ class AboutPattayaWidget(QWidget, Ui_AboutPattayaWidget):
         self.player.setSource(QUrl('qrc:/assets/sound/Reloaded.mp3'))
         self.player.setAudioOutput(self.audio)
         self.audio.setVolume(50)
-        self.setupUi(self)
+        self.setupUi(self)    
+
+    def closeEvent(self, event):
+        self.player.stop()
+
+    def play_sound(self):
         self.player.play()
 

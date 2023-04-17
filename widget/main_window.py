@@ -95,6 +95,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def about_pattaya_project(self):
         self.about_dialog.show()
+        self.about_dialog.play_sound()
 
     def about_qt(self):
         QApplication.aboutQt()
