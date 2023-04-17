@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt,QModelIndex,QTimer
+from PySide6.QtCore import Qt,QModelIndex,QTimer,QUrl
 from PySide6.QtWidgets import QApplication, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget
 from PySide6.QtGui import QIcon,QAction,QColor
 from core.info import PATTAYA_PANEL_VERSION

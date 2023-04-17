@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>assets/sound/Reloaded.mp3</file>
     <file>assets/images/rat.png</file>
     <file>assets/images/monitor.png</file>
     <file>assets/images/monitor-off.png</file>
