@@ -11,9 +11,10 @@ class AboutPattayaWidget(QWidget, Ui_AboutPattayaWidget):
         
         self.player = QMediaPlayer()
         self.audio = QAudioOutput()
-        self.player.setAudioOutput(self.audio)
         self.player.setSource(QUrl('qrc:/assets/sound/Reloaded.mp3'))
-        self.audio.setVolume(50)
+        self.audio.setVolume(0.5)
+
+        self.player.setAudioOutput(self.audio)
 
     def closeEvent(self, event):
         self.player.stop()
