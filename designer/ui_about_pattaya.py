@@ -25,6 +25,8 @@ class Ui_AboutPattayaWidget(object):
             AboutPattayaWidget.setObjectName(u"AboutPattayaWidget")
         AboutPattayaWidget.setWindowModality(Qt.NonModal)
         AboutPattayaWidget.resize(490, 189)
+        AboutPattayaWidget.setMinimumSize(QSize(490, 189))
+        AboutPattayaWidget.setMaximumSize(QSize(490, 189))
         AboutPattayaWidget.setCursor(QCursor(Qt.CrossCursor))
         AboutPattayaWidget.setMouseTracking(False)
         icon = QIcon()
