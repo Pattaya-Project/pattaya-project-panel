@@ -7,7 +7,6 @@ from designer.ui_main_window import Ui_MainWindow
 from model.bot_table_model import BotTableModel
 import qdarktheme
 import psutil
-from widget.about import AboutWidget
 from widget.about_pattaya import AboutPattayaWidget
 
 
@@ -82,6 +81,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Connect the context menu to the table widget
         self.bot_table_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.bot_table_view.customContextMenuRequested.connect(lambda pos:  self.context_menu.exec(self.bot_table_view.mapToGlobal(pos)))
+
+
+        # Alternatively, you can use setStyleSheet()
+        self.panel_log_text_browser.setStyleSheet("background-color: #000000;")
+        self.server_log_text_browser.setStyleSheet("background-color: #000000;")
 
 
     def app_exit(self):

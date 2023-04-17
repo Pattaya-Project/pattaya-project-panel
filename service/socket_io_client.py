@@ -28,7 +28,7 @@ class SocketIOClient(QObject):
     def start(self):
         try:
             self.socket_io.connect(self.url, namespaces=self.namespace)
-            PattayaPanelUtil.panel_log_info("Panel has been connect to Pattaya server!")
+            PattayaPanelUtil.panel_log_info("Panel has been connected to Pattaya server!")
             self.connected_to_server.emit()
         except Exception as e:
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
@@ -39,7 +39,7 @@ class SocketIOClient(QObject):
     def stop(self):
         try:
             self.socket_io.disconnect()
-            PattayaPanelUtil.panel_log_info("Panel has been disconnect to Pattaya server!")
+            PattayaPanelUtil.panel_log_info("Panel has been disconnected to Pattaya server!")
             self.disconnected_to_server.emit()
         except Exception as e:
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
@@ -58,6 +58,6 @@ class SocketIOClient(QObject):
         
 
     def _panel_received_server_heartbeat(self, data):
-        PattayaPanelUtil.server_log_info(f"Server hearthbeat: {data['message']}")
+        PattayaPanelUtil.server_log_info(f"Server heartbeat: {data['message']}")
 
 

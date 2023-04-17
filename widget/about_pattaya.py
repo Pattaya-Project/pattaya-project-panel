@@ -7,13 +7,13 @@ from PySide6.QtMultimedia import QMediaPlayer,QAudioOutput
 class AboutPattayaWidget(QWidget, Ui_AboutPattayaWidget):
     def __init__(self):
         super().__init__()        
+        self.setupUi(self)
         
         self.player = QMediaPlayer()
         self.audio = QAudioOutput()
-        self.player.setSource(QUrl('qrc:/assets/sound/Reloaded.mp3'))
         self.player.setAudioOutput(self.audio)
+        self.player.setSource(QUrl('qrc:/assets/sound/Reloaded.mp3'))
         self.audio.setVolume(50)
-        self.setupUi(self)    
 
     def closeEvent(self, event):
         self.player.stop()
