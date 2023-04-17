@@ -1,13 +1,14 @@
-from PySide6.QtCore import Qt,QModelIndex
-from PySide6.QtWidgets import QApplication, QMainWindow,QMessageBox,QTableView,QMenu
-from PySide6.QtGui import QIcon,QAction
+from PySide6.QtCore import Qt,QModelIndex,QTimer
+from PySide6.QtWidgets import QApplication, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget
+from PySide6.QtGui import QIcon,QAction,QColor
 from core.info import PATTAYA_PANEL_VERSION
 from core.util import PattayaPanelUtil
 from designer.ui_main_window import Ui_MainWindow
 from model.bot_table_model import BotTableModel
 import qdarktheme
-
+import psutil
 from widget.about import AboutWidget
+from widget.about_pattaya import AboutPattayaWidget
 
 
 
@@ -23,7 +24,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle(self.update_title)
         self.setMaximumSize(16777215, 16777215)
 
-        self.about_dialog = AboutWidget()
+        self.about_dialog = AboutPattayaWidget()
+        self.about_dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
         
         PattayaPanelUtil.setup(self.panel_log_text_browser, self.server_log_text_browser)
         self.socket_io_client = socket_io_client
@@ -34,6 +36,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.bot_table_view.setSelectionMode(QTableView.SingleSelection)
         self.bot_table_view.setModel(self.bots_table_model)
         self.bot_table_view.setAlternatingRowColors(True)
+
+        self.timer = QTimer(self) # create a timer to update the stats periodically
+        self.timer.timeout.connect(self.updateStats)
+        self.timer.start(1000) # update the stats every 1 second
+
+
+        self.cpuLabel = QLabel(self)
+        self.ramLabel = QLabel(self)
+
+        spacer = QWidget()
+
+        self.statusBar().addWidget(spacer,1)
+        self.statusBar().addWidget(self.cpuLabel)
+        self.statusBar().addWidget(self.ramLabel)
+        self.statusBar().show()
 
 
         self.actionExit.triggered.connect(self.app_exit)
@@ -124,3 +141,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def disable_stop_action(self):
         self.actionStart.setDisabled(False)
         self.actionStop.setDisabled(True)
+
+
+    def updateStats(self):
+        cpuPercent = psutil.cpu_percent()
+        ramPercent = psutil.virtual_memory().percent
+        self.cpuLabel.setText("CPU usage: {}%".format(cpuPercent))
+        self.ramLabel.setText("RAM usage: {}%".format(ramPercent))

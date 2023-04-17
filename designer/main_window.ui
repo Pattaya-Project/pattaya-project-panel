@@ -23,7 +23,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Pattaya Project Panel - $VERSION [ Online bots: $ONLINE_BOT ]</string>
+   <string>Pattaya RAT Panel - $VERSION [ Online bots: $ONLINE_BOT ]</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resource.qrc">
+    <normaloff>:/assets/images/rat.png</normaloff>:/assets/images/rat.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
