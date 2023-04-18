@@ -14,7 +14,7 @@ class SocketIOClient(QObject):
     disconnected_to_server = Signal()
     panel_received_server_heartbeat = Signal(str)
 
-    def __init__(self, url, namespace):
+    def __init__(self, url = '', namespace = ''):
         super().__init__()
         self.url = url
         self.namespace = namespace
@@ -25,7 +25,9 @@ class SocketIOClient(QObject):
         self.socket_io.on('panel_received_server_heartbeat', self._panel_received_server_heartbeat)
 
 
-    def start(self):
+    def start(self, url, token, namespace):
+        self.url = url
+        self.namespace = namespace
         try:
             self.socket_io.connect(self.url, namespaces=self.namespace)
             PattayaPanelUtil.panel_log_info("Panel has been connected to Pattaya server!")
