@@ -19,7 +19,6 @@ from PySide6.QtWidgets import (QApplication, QDialog, QLabel, QSizePolicy,
     QVBoxLayout, QWidget)
 import designer.resource_rc
 
-
 class Ui_AboutPattayaWidget(object):
     def setupUi(self, AboutPattayaWidget):
         if not AboutPattayaWidget.objectName():
@@ -77,7 +76,7 @@ class Ui_AboutPattayaWidget(object):
         self.label_9 = QLabel(AboutPattayaWidget)
         self.label_9.setObjectName(u"label_9")
         self.label_9.setGeometry(QRect(330, 10, 171, 171))
-        self.label_9.setPixmap(QPixmap(u":/assets/images/rat.png"))
+        self.label_9.setPixmap(QPixmap(u":/assets/images/rat2.png"))
         self.label_9.setScaledContents(True)
         self.label_10 = QLabel(AboutPattayaWidget)
         self.label_10.setObjectName(u"label_10")

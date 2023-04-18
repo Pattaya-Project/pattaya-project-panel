@@ -88,6 +88,7 @@
     </property>
     <addaction name="actionStart"/>
     <addaction name="actionStop"/>
+    <addaction name="actionRefresh_Bot"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuSetting">
@@ -129,9 +130,11 @@
    </attribute>
    <addaction name="actionStart"/>
    <addaction name="actionStop"/>
+   <addaction name="actionRefresh_Bot"/>
    <addaction name="actionExit"/>
    <addaction name="separator"/>
    <addaction name="actionServer_setting"/>
+   <addaction name="actionBot_Terminal"/>
   </widget>
   <action name="actionStart">
    <property name="icon">
@@ -203,6 +206,27 @@
    </property>
    <property name="text">
     <string>Light</string>
+   </property>
+  </action>
+  <action name="actionRefresh_Bot">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/assets/images/reload.png</normaloff>:/assets/images/reload.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh Bot</string>
+   </property>
+  </action>
+  <action name="actionBot_Terminal">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/assets/images/terminal.png</normaloff>:/assets/images/terminal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Bot Terminal</string>
+   </property>
+   <property name="toolTip">
+    <string>Bot Terminal</string>
    </property>
   </action>
  </widget>
