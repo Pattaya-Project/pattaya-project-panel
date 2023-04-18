@@ -1,0 +1,1 @@
+pyinstaller --name=pattaya-panel --icon=.\designer\assets\images\rat.ico --noconsole --onefile .\main.py
