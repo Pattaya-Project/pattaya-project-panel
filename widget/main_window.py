@@ -61,8 +61,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.actionStart.triggered.connect(self.start)
         self.actionStop.triggered.connect(self.stop)
+        self.actionRefresh_Bot.triggered.connect(self.refresh_bot)
 
         self.actionStop.setDisabled(True)
+        self.actionRefresh_Bot.setDisabled(True)
 
         self.socket_io_client.connected_to_server.connect(self.disable_start_action)
         self.socket_io_client.disconnected_to_server.connect(self.disable_stop_action)
@@ -92,6 +94,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pattaya_server_setting = PattayaServerSetting()
         self.actionServer_setting.triggered.connect(self.pattaya_setting)
         self.pattaya_server_setting.setWindowIcon(QIcon(":/assets/images/rat.png"))
+
 
 
     def app_exit(self):
@@ -157,12 +160,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def disable_start_action(self):
         self.actionStart.setDisabled(True)
         self.actionStop.setDisabled(False)
+        self.actionRefresh_Bot.setDisabled(False)
 
 
 
     def disable_stop_action(self):
         self.actionStart.setDisabled(False)
         self.actionStop.setDisabled(True)
+        self.actionRefresh_Bot.setDisabled(True)
 
 
     def updateStats(self):
@@ -184,3 +189,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.Ok)
         else:
             PattayaPanelUtil.panel_log_error(f'Ignore Pattaya server configuration')
+        
+
+
+    def refresh_bot(self):
+        self.socket_io_client.socket_io.emit("panel_request_bot_data")
