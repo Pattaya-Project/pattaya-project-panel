@@ -47,6 +47,8 @@ class SocketIOClient(QObject):
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
     def _on_connect(self):
+        self.connected_to_server.emit()
+        self.panel_received_bot_count_data.emit(self._bot_len)
         PattayaPanelUtil.panel_log_info('Connected to Socket.IO server.')
 
     def _on_disconnect(self):
@@ -56,8 +58,9 @@ class SocketIOClient(QObject):
 
     def _panel_received_bot_data(self, data):
        self.panel_received_bot_data.emit(data['data'])
-       self.panel_received_bot_count_data.emit(len(data['data']))
-       PattayaPanelUtil.panel_log_info(f"Server emit bot data to panel: {str(len(data['data']))} bots")
+       self._bot_len = len(data['data'])
+       self.panel_received_bot_count_data.emit(self._bot_len)
+       PattayaPanelUtil.panel_log_info(f"Server emit bot data to panel: {str(self._bot_len)} bots")
         
 
     def _panel_received_server_heartbeat(self, data):
