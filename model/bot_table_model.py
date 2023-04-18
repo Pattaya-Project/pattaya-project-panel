@@ -29,6 +29,7 @@ class BotTableModel(QAbstractTableModel):
             if col == 12:
                 iso_date_string = str(self.internal_data[row][self._header[col]])
                 iso_date = datetime.datetime.fromisoformat(iso_date_string)
+                iso_date = iso_date + datetime.timedelta(hours=7)
                 new_format = iso_date.strftime("%Y-%m-%d %H:%M:%S")
                 return new_format
             return str(self.internal_data[row][self._header[col]])
