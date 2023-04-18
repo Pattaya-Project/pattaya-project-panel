@@ -19,14 +19,15 @@ from PySide6.QtWidgets import (QApplication, QDialog, QLabel, QSizePolicy,
     QVBoxLayout, QWidget)
 import designer.resource_rc
 
+
 class Ui_AboutPattayaWidget(object):
     def setupUi(self, AboutPattayaWidget):
         if not AboutPattayaWidget.objectName():
             AboutPattayaWidget.setObjectName(u"AboutPattayaWidget")
         AboutPattayaWidget.setWindowModality(Qt.NonModal)
-        AboutPattayaWidget.resize(490, 189)
-        AboutPattayaWidget.setMinimumSize(QSize(490, 189))
-        AboutPattayaWidget.setMaximumSize(QSize(490, 189))
+        AboutPattayaWidget.resize(518, 227)
+        AboutPattayaWidget.setMinimumSize(QSize(518, 227))
+        AboutPattayaWidget.setMaximumSize(QSize(518, 227))
         AboutPattayaWidget.setCursor(QCursor(Qt.CrossCursor))
         AboutPattayaWidget.setMouseTracking(False)
         icon = QIcon()
@@ -34,7 +35,7 @@ class Ui_AboutPattayaWidget(object):
         AboutPattayaWidget.setWindowIcon(icon)
         self.label_7 = QLabel(AboutPattayaWidget)
         self.label_7.setObjectName(u"label_7")
-        self.label_7.setGeometry(QRect(20, 150, 81, 16))
+        self.label_7.setGeometry(QRect(21, 141, 59, 16))
         self.layoutWidget = QWidget(AboutPattayaWidget)
         self.layoutWidget.setObjectName(u"layoutWidget")
         self.layoutWidget.setGeometry(QRect(10, 10, 291, 61))
@@ -68,16 +69,22 @@ class Ui_AboutPattayaWidget(object):
         self.label_3.setGeometry(QRect(20, 80, 81, 16))
         self.label_8 = QLabel(AboutPattayaWidget)
         self.label_8.setObjectName(u"label_8")
-        self.label_8.setGeometry(QRect(90, 150, 101, 16))
+        self.label_8.setGeometry(QRect(86, 141, 171, 17))
         self.label_8.setOpenExternalLinks(True)
         self.label_6 = QLabel(AboutPattayaWidget)
         self.label_6.setObjectName(u"label_6")
         self.label_6.setGeometry(QRect(90, 120, 161, 16))
         self.label_9 = QLabel(AboutPattayaWidget)
         self.label_9.setObjectName(u"label_9")
-        self.label_9.setGeometry(QRect(310, 10, 171, 171))
+        self.label_9.setGeometry(QRect(330, 10, 171, 171))
         self.label_9.setPixmap(QPixmap(u":/assets/images/rat.png"))
         self.label_9.setScaledContents(True)
+        self.label_10 = QLabel(AboutPattayaWidget)
+        self.label_10.setObjectName(u"label_10")
+        self.label_10.setGeometry(QRect(21, 171, 48, 16))
+        self.label_11 = QLabel(AboutPattayaWidget)
+        self.label_11.setObjectName(u"label_11")
+        self.label_11.setGeometry(QRect(75, 171, 211, 17))
 
         self.retranslateUi(AboutPattayaWidget)
 
@@ -93,7 +100,9 @@ class Ui_AboutPattayaWidget(object):
         self.label_5.setText(QCoreApplication.translate("AboutPattayaWidget", u"Server -> Nestjs/Socket.io", None))
         self.label_3.setText(QCoreApplication.translate("AboutPattayaWidget", u"Tech stacks :", None))
         self.label_8.setText(QCoreApplication.translate("AboutPattayaWidget", u"<html><head/><body><p><a href=\"https://github.com/un4ckn0wl3z\"><span style=\" font-size:10pt; font-weight:700; color:#0000ff;\">un4ckn0wl3z</span></a></p></body></html>", None))
-        self.label_6.setText(QCoreApplication.translate("AboutPattayaWidget", u"Client ->C# (.Net)", None))
+        self.label_6.setText(QCoreApplication.translate("AboutPattayaWidget", u"Client -> C# (.Net)", None))
         self.label_9.setText("")
+        self.label_10.setText(QCoreApplication.translate("AboutPattayaWidget", u"Contact :", None))
+        self.label_11.setText(QCoreApplication.translate("AboutPattayaWidget", u"<html><head/><body><p><a href=\"mailto://pattaya.dev@unknownclub.net\"><span style=\" font-size:10pt; font-weight:700; color:#0000ff;\">pattaya.dev@unknownclub.net</span></a></p></body></html>", None))
     # retranslateUi
 

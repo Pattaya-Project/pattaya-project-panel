@@ -18,6 +18,7 @@ class SocketIOClient(QObject):
         super().__init__()
         self.url = url
         self.namespace = namespace
+        self._bot_len = 0
         self.socket_io = socketio.Client()
         self.socket_io.on('connect', self._on_connect)
         self.socket_io.on('disconnect', self._on_disconnect)
