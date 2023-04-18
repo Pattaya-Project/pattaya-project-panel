@@ -29,7 +29,7 @@ class SocketIOClient(QObject):
         self.url = url
         self.namespace = namespace
         try:
-            self.socket_io.connect(self.url, headers={'Authorization': f'Bearer {token}'}, namespaces=self.namespace)
+            self.socket_io.connect(self.url, headers={'Authorization': f'###### {token}'}, namespaces=self.namespace)
             PattayaPanelUtil.panel_log_info("Panel has been connected to Pattaya server!")
             self.connected_to_server.emit()
         except Exception as e:
