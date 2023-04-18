@@ -1,7 +1,7 @@
 import datetime
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex
 from PySide6.QtWidgets import QApplication, QTableView
-
+from PySide6.QtGui import QIcon,QColor
 
 class BotTableModel(QAbstractTableModel):
     def __init__(self, socket_io_client, parent=None):
@@ -32,6 +32,14 @@ class BotTableModel(QAbstractTableModel):
                 new_format = iso_date.strftime("%Y-%m-%d %H:%M:%S")
                 return new_format
             return str(self.internal_data[row][self._header[col]])
+                #Target th favorite color column
+        elif ((role == Qt.DecorationRole) and (index.column() == 11)) :
+            flag = QIcon()
+            try:
+                flag = QIcon(f":/flags/assets/flags/{str(self.internal_data[row][self._header[col]]).lower()}.png")
+            except Exception as e:
+                flag = QIcon(f":/assets/images/cross.png")
+            return flag
         return None
 
     def headerData(self, section, orientation, role) :
