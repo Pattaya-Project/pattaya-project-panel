@@ -29,7 +29,7 @@ class SocketIOClient(QObject):
         self.url = url
         self.namespace = namespace
         try:
-            self.socket_io.connect(self.url, namespaces=self.namespace)
+            self.socket_io.connect(self.url, headers={'Authorization': f'Bearer {token}'}, namespaces=self.namespace)
             PattayaPanelUtil.panel_log_info("Panel has been connected to Pattaya server!")
             self.connected_to_server.emit()
         except Exception as e:
@@ -51,6 +51,7 @@ class SocketIOClient(QObject):
 
     def _on_disconnect(self):
         self.panel_received_bot_count_data.emit(0)
+        self.disconnected_to_server.emit()
         PattayaPanelUtil.panel_log_info('Disconnected from Socket.IO server.')
 
     def _panel_received_bot_data(self, data):
