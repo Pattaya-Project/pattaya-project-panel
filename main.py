@@ -16,7 +16,7 @@ import win32api
 import winerror
 
 app = QtWidgets.QApplication(sys.argv)
-qdarktheme.setup_theme()
+qdarktheme.setup_theme(custom_colors={"primary": "#FB00FF"})
 app.aboutToQuit.connect(on_exit)
 
 socket_io_client = SocketIOClient()

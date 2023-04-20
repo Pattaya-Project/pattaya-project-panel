@@ -101,7 +101,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.app.exit()
 
     def enable_dark_theme(self):
-        qdarktheme.setup_theme()
+        qdarktheme.setup_theme(custom_colors={"primary": "#FB00FF"})
 
     def enable_light_theme(self):
         qdarktheme.setup_theme(theme="light")
