@@ -8,7 +8,7 @@ import qdarktheme
 
 def on_exit():
     socket_io_client.stop()
-    print("Exiting the application...")
+    #print("Exiting the application...")
 
 app = QtWidgets.QApplication(sys.argv)
 qdarktheme.setup_theme()

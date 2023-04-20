@@ -121,7 +121,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def ping_bot(self):
         item = self.pick_bot()
-        print(item['wanIp'])
+        # print(item['wanIp'])
 
 
     def pick_bot(self):
