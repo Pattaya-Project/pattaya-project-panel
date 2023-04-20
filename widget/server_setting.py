@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QSettings
-from PySide6.QtWidgets import QDialog,QLineEdit,QDialogButtonBox
+from PySide6.QtCore import QSettings
+from PySide6.QtWidgets import QDialog,QDialogButtonBox
 from designer.ui_pattaya_server_setting import Ui_ServerSettingWidget
 
 

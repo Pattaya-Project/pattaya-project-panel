@@ -1,6 +1,5 @@
 from PySide6.QtCore import QObject, Signal
 import socketio
-import json
 
 from core.util import PattayaPanelUtil
 

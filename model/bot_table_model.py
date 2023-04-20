@@ -1,7 +1,6 @@
 import datetime
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex
-from PySide6.QtWidgets import QApplication, QTableView
-from PySide6.QtGui import QIcon,QColor
+from PySide6.QtGui import QIcon
 
 class BotTableModel(QAbstractTableModel):
     def __init__(self, socket_io_client, parent=None):

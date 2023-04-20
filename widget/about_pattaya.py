@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import Qt,QUrl
+from PySide6.QtCore import QUrl
 from designer.ui_about_pattaya import Ui_AboutPattayaWidget
 from PySide6.QtMultimedia import QMediaPlayer,QAudioOutput
 

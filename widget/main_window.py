@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt,QModelIndex,QTimer,QUrl,QSettings
+from PySide6.QtCore import Qt,QTimer,QSettings
 from PySide6.QtWidgets import QApplication, QDialog, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget
-from PySide6.QtGui import QIcon,QAction,QColor
+from PySide6.QtGui import QIcon,QAction
 from core.info import PATTAYA_PANEL_VERSION
 from core.util import PattayaPanelUtil
 from designer.ui_main_window import Ui_MainWindow
