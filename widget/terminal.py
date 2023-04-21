@@ -15,7 +15,7 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         self.bot_send_task_line_edit.setStyleSheet("color: #FB00FF;")
 
 
-        command = ['apple', 'banana', 'cherry', 'date', 'elderberry']
+        command = ['help', 'cd', 'pwd', 'mkdir', 'start']
         completer = QCompleter(command)
         self.bot_send_task_line_edit.setCompleter(completer)
 
