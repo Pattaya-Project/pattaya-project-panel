@@ -1,6 +1,7 @@
 from datetime import datetime
 
 class PattayaPanelUtil:
+    terminals = {}
 
     @staticmethod
     def setup(qtext_panel_browser, qtext_server_browser):

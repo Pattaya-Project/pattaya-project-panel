@@ -1,1 +1,1 @@
-PATTAYA_PANEL_VERSION = 'v0.0.1-beta'
+PATTAYA_PANEL_VERSION = '[developmet version]'
