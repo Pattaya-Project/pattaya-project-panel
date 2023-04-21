@@ -3,7 +3,11 @@ import sys
 from PySide6 import QtWidgets
 from widget.main_window import MainWindow
 from service.socket_io_client import SocketIOClient
+from PySide6.QtCore import QSettings
 import qdarktheme
+import win32event
+import win32api
+import winerror
 
 
 def on_exit():
@@ -11,12 +15,17 @@ def on_exit():
     #print("Exiting the application...")
 
 
-import win32event
-import win32api
-import winerror
-
 app = QtWidgets.QApplication(sys.argv)
-qdarktheme.setup_theme(custom_colors={"primary": "#FB00FF"})
+settings = QSettings("unknownclub.net", "Pattaya")
+
+match settings.value("themes"):
+    case 0:
+        qdarktheme.setup_theme(custom_colors={"primary": "#FB00FF"})
+    case 1:
+        qdarktheme.setup_theme(theme="light",custom_colors={"primary": "#FB00FF"})
+
+del settings
+
 app.aboutToQuit.connect(on_exit)
 
 socket_io_client = SocketIOClient()

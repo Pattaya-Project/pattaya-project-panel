@@ -23,6 +23,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle(self.update_title)
         self.setMaximumSize(16777215, 16777215)
         self.settings = QSettings("unknownclub.net", "Pattaya")
+        
+        if(self.settings.value("themes") is None):
+            self.settings.setValue("themes", 0)
+        
 
         self.about_dialog = AboutPattayaWidget()
         self.about_dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -102,9 +106,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def enable_dark_theme(self):
         qdarktheme.setup_theme(custom_colors={"primary": "#FB00FF"})
+        self.settings.setValue("themes", 0)
 
     def enable_light_theme(self):
-        qdarktheme.setup_theme(theme="light")
+        qdarktheme.setup_theme(theme="light",custom_colors={"primary": "#FB00FF"})
+        self.settings.setValue("themes", 1)
 
     def about_pattaya_project(self):
         self.about_dialog.show()
