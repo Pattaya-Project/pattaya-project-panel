@@ -135,6 +135,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     def update_online_bot(self, data):
+        if data == 0:
+            self.bot_table_view.setDisabled(True)
+        else:
+            self.bot_table_view.setDisabled(False)
         self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(data))
         self.setWindowTitle(self.update_title)
 
