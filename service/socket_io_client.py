@@ -38,6 +38,13 @@ class SocketIOClient(QObject):
         
         self.socket_io.emit("panel_request_bot_data")
 
+
+    def send_command(self, event, data):
+        try:
+            self.socket_io.emit(event, data)
+        except Exception as e:
+            PattayaPanelUtil.panel_log_error(f'{str(e)}')
+
     def stop(self):
         try:
             self.socket_io.disconnect()
