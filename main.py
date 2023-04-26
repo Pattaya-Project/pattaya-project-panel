@@ -1,6 +1,7 @@
 import sys
 
 from PySide6 import QtWidgets
+from core.util import PattayaPanelUtil
 from widget.main_window import MainWindow
 from service.socket_io_client import SocketIOClient
 from PySide6.QtCore import QSettings
@@ -11,6 +12,7 @@ import winerror
 
 
 def on_exit():
+    del PattayaPanelUtil.terminals
     socket_io_client.stop()
     #print("Exiting the application...")
 

