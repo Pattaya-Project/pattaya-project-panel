@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>assets/images/edit-language.png</file>
     <file>assets/images/books-stack.png</file>
     <file>assets/images/terminal.png</file>
     <file>assets/images/rat2.png</file>

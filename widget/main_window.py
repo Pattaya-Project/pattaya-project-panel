@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt,QTimer,QSettings
-from PySide6.QtWidgets import QApplication, QDialog, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget
-from PySide6.QtGui import QIcon,QAction, QClipboard 
+from PySide6.QtWidgets import QApplication, QDialog, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget,QFileDialog
+from PySide6.QtGui import QIcon,QAction, QClipboard
 from core.info import PATTAYA_PANEL_VERSION
 from core.util import PattayaPanelUtil
 from designer.ui_main_window import Ui_MainWindow
@@ -66,6 +66,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionLight.triggered.connect(self.enable_light_theme)
         self.actionAbout_Pattaya_Project.triggered.connect(self.about_pattaya_project)
         self.actionAbout_Qt.triggered.connect(self.about_qt)
+
+        self.actionFile_to_Base64_Encode.triggered.connect(self.encode_file_base64)
 
         self.actionStart.triggered.connect(self.start)
         self.actionStop.triggered.connect(self.stop)
@@ -250,6 +252,25 @@ HWID -> {item['hwid']}
 
     def refresh_bot(self):
         self.socket_io_client.socket_io.emit("panel_request_bot_data")
+
+
+    def encode_file_base64(self):
+        #getOpenFileName  
+        file_name,_ = QFileDialog.getOpenFileName(self, "Open File",
+                                                      ".",
+                                                      "All files(*.*)")
+        
+        if file_name == "":
+            return
+        
+        base64_exe = PattayaPanelUtil.base64_file_encode(file_name)
+        self.clipboard.setText(base64_exe)
+        PattayaPanelUtil.panel_log_info(f'f{file_name} has been encoded in base64 format: f{base64_exe}')
+        QMessageBox.information(self, 
+            "Base64Encoding tool",
+            "File success encoded in base64 format, Check your clipboard",
+            QMessageBox.Ok)
+        
         
 
     def closeEvent(self, event):

@@ -112,9 +112,16 @@
     <addaction name="actionLight"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionFile_to_Base64_Encode"/>
+   </widget>
    <addaction name="menuPattaya"/>
    <addaction name="menuSetting"/>
    <addaction name="menuTheme"/>
+   <addaction name="menuTools"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -135,6 +142,8 @@
    <addaction name="separator"/>
    <addaction name="actionServer_setting"/>
    <addaction name="actionBot_Terminal"/>
+   <addaction name="separator"/>
+   <addaction name="actionFile_to_Base64_Encode"/>
   </widget>
   <action name="actionStart">
    <property name="icon">
@@ -227,6 +236,15 @@
    </property>
    <property name="toolTip">
     <string>Bot Terminal</string>
+   </property>
+  </action>
+  <action name="actionFile_to_Base64_Encode">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/assets/images/edit-language.png</normaloff>:/assets/images/edit-language.png</iconset>
+   </property>
+   <property name="text">
+    <string>File to Base64 Encode</string>
    </property>
   </action>
  </widget>

