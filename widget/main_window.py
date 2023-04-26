@@ -253,6 +253,7 @@ HWID -> {item['hwid']}
         
 
     def closeEvent(self, event):
-        for terminal in PattayaPanelUtil.terminals.values():
-            terminal.socket_io_client.disconnect()
+        terminals = PattayaPanelUtil.terminals.values()
+        for terminal in terminals:
+            terminal.socket_io_client.stop()
             terminal.close()

