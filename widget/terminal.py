@@ -30,6 +30,7 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         self.socket_io_client.server_ack_result.connect(self.server_update_bot_terminal)
 
         self.socket_io_client.connected_to_server.connect(self.init_terminal)
+        self.socket_io_client.server_ack_bot_discon.connect(self._on_disconnect)
 
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
@@ -114,6 +115,14 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         self.task_result_text_browser.ensureCursorVisible()
 
 
+    def update_bot_terminal_error(self, command):
+        current_time = datetime.now()
+        formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
+        self.task_result_text_browser.append(f"<font color='red'>[-] [{formatted_time}] Seem bot disconnected [{self.bot['username']}]</font><font color='#F6FA00'><<<</font></font><font color='#00E3FA'> {command}</font>")
+        self.task_result_text_browser.ensureCursorVisible()
+
+
     def _on_disconnect(self):
-        self.update_bot_terminal("Terminal has been disconnected")
+        self.bot_send_task_line_edit.setDisabled(True)
+        self.update_bot_terminal_error("Bot bas been disconnected from server")
 

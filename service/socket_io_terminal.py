@@ -10,6 +10,7 @@ class SocketIOTerminalClient(QObject):
     disconnected_to_server = Signal(str)
     server_ack = Signal(str)
     server_ack_result = Signal(str)
+    server_ack_bot_discon = Signal()
 
     def __init__(self, bot):
         super().__init__()
@@ -18,12 +19,14 @@ class SocketIOTerminalClient(QObject):
 
         self.bot_event_ack = f'server_ack_terminal_bot_task_result_{self.bot["hwid"]}'
         self.bot_event_result = f'panel_terminal_bot_task_result_{self.bot["hwid"]}'
+        self.bot_event_bot_discon = f'panel_terminal_bot_seem_disconnected_{self.bot["socketId"]}'
 
         self.socket_io = socketio.Client()
         self.socket_io.on('connect', self._on_connect)
         self.socket_io.on('disconnect', self._on_disconnect)
         self.socket_io.on(self.bot_event_ack, self._on_server_ack)
         self.socket_io.on(self.bot_event_result, self._on_server_ack_result)
+        self.socket_io.on(self.bot_event_bot_discon, self._on_server_ack_bot_discon)
 
 
     def start(self, url, token, namespace):
@@ -66,4 +69,8 @@ class SocketIOTerminalClient(QObject):
     def _on_server_ack_result(self, data):
        self.server_ack_result.emit(data['message'])
        PattayaPanelUtil.panel_log_info(f"Terminal receieved bot result from server")
+
+    def _on_server_ack_bot_discon(self):
+       self.server_ack_bot_discon.emit()
+       PattayaPanelUtil.panel_log_info(f"Seem current bot disconnected from server")
 
