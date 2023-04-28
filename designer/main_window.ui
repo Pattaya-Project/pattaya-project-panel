@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Pattaya RAT Panel - $VERSION [ Online bots: $ONLINE_BOT ]</string>
+   <string>Pattaya RAT Panel - $VERSION [ Online bots: $ONLINE_BOT ] [ User: $PANEL_USER ]</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resource.qrc">

