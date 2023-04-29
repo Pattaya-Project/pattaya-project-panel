@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget,QCompleter,QFileDialog
+from PySide6.QtWidgets import QWidget,QCompleter,QFileDialog,QMessageBox
 from PySide6.QtGui import QIcon,QFont,QKeyEvent,QPalette,QColor
 from PySide6.QtCore import Qt
 from core.util import PattayaPanelUtil
@@ -11,14 +11,17 @@ from service.socket_io_terminal import SocketIOTerminalClient
 
 
 class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
-    def __init__(self, bot, url, token, namespace):
+    def __init__(self, bot, url, token, namespace, terminal_event):
         super().__init__()        
         self.setupUi(self)
+        self.terminal_event = terminal_event
         self.bot = bot
         self.url = url
         self.token = token
         self.namespace = namespace
         self.socket_io_client = SocketIOTerminalClient(self.bot)
+
+        self.terminal_event.on_close_terminal.connect(self.closeEvent)
 
         self.setWindowIcon(QIcon(":/assets/images/rat.png"))
 
@@ -44,6 +47,9 @@ QTextEdit {
 
         self.socket_io_client.connected_to_server.connect(self.init_terminal)
         self.socket_io_client.server_ack_bot_discon.connect(self._on_disconnect)
+
+        self.socket_io_client.server_ack_bot_not_allow_command.connect(self.update_bot_not_allow_command_error)
+
 
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
@@ -101,6 +107,15 @@ QTextEdit {
             file = PattayaPanelUtil.base64_file_encode(file_name)
             PattayaPanelUtil.panel_log_info(f'f{file_name} has been encoded in base64 format: f{file}')
         
+        if text == 'killbot':
+            ret = QMessageBox.warning(self, 
+                                    "Kill bot warning",
+                                    "Do your sure to kill this bot? You will lost bot connection until bot reconnect again!",
+                                    QMessageBox.Ok | QMessageBox.Cancel)
+            if ret is not QMessageBox.Ok:
+                self.bot_send_task_line_edit.clear()
+                return
+        
         PattayaPanelUtil.panel_log_info(f"Enter {text} command to {self.bot['username']}")
         self.update_bot_terminal(text)
         args = text.split(" ", 1)
@@ -131,7 +146,6 @@ QTextEdit {
 
 
     def closeEvent(self, event):
-        # self.socket_io_client.socket_io.off(self.bot_event)
         self.socket_io_client.stop()
         PattayaPanelUtil.terminals.pop(self.bot['hwid'])
         PattayaPanelUtil.panel_log_info(f"Closed {self.bot['username']} terminal")
@@ -169,6 +183,15 @@ QTextEdit {
     def _on_disconnect(self):
         self.bot_send_task_line_edit.setDisabled(True)
         self.update_bot_terminal_error("Bot bas been disconnected from server")
+
+
+    def update_bot_not_allow_command_error(self, command):
+        self.bot_send_task_line_edit.setDisabled(False)
+        self.bot_send_task_line_edit.setFocus()
+        current_time = datetime.now()
+        formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
+        self.task_result_text_browser.append(f"<font color='#FE5900'>[-] [{formatted_time}] Server ack error]</font><font color='#FE5900'></font></font><font color='#FE5900'> {command}</font>")
+        self.task_result_text_browser.ensureCursorVisible()
 
 
 

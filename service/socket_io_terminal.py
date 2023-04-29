@@ -11,6 +11,7 @@ class SocketIOTerminalClient(QObject):
     server_ack = Signal(str)
     server_ack_result = Signal(str)
     server_ack_bot_discon = Signal()
+    server_ack_bot_not_allow_command = Signal(str)
 
     def __init__(self, bot):
         super().__init__()
@@ -18,6 +19,7 @@ class SocketIOTerminalClient(QObject):
         self.bot = bot
         self.panel_token = QSettings("unknownclub.net", "Pattaya").value('token')
         self.bot_event_ack = f'{self.panel_token}_server_ack_terminal_bot_task_result_{self.bot["hwid"]}'
+        self.bot_event_not_allow_command = f'{self.panel_token}_server_ack_not_allow_terminal_bot_task_result_{self.bot["hwid"]}'
         self.bot_event_result = f'{self.panel_token}_panel_terminal_bot_task_result_{self.bot["hwid"]}'
         self.bot_event_bot_discon = f'panel_terminal_bot_seem_disconnected_{self.bot["socketId"]}'
 
@@ -27,6 +29,7 @@ class SocketIOTerminalClient(QObject):
         self.socket_io.on(self.bot_event_ack, self._on_server_ack)
         self.socket_io.on(self.bot_event_result, self._on_server_ack_result)
         self.socket_io.on(self.bot_event_bot_discon, self._on_server_ack_bot_discon)
+        self.socket_io.on(self.bot_event_not_allow_command, self._on_bot_event_not_allow_command)
 
 
     def start(self, url, token, namespace):
@@ -73,4 +76,8 @@ class SocketIOTerminalClient(QObject):
     def _on_server_ack_bot_discon(self):
        self.server_ack_bot_discon.emit()
        PattayaPanelUtil.panel_log_info(f"Seem current bot disconnected from server")
+
+    def _on_bot_event_not_allow_command(self, data):
+       self.server_ack_bot_not_allow_command.emit(data['message'])
+       PattayaPanelUtil.panel_log_info(f"This panel not allow using current command")
 

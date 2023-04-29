@@ -25,8 +25,9 @@ class SocketIOClient(QObject):
         self.socket_io = socketio.Client()
         self.socket_io.on('connect', self._on_connect)
         self.socket_io.on('disconnect', self._on_disconnect)
-        self.socket_io.on(f'{self.panel_token}_panel_received_bot_data', self._panel_received_bot_data)
-        self.socket_io.on(f'{self.panel_token}_panel_received_username', self._panel_received_username)
+        if self.panel_token is not None:
+            self.socket_io.on(f'{self.panel_token}_panel_received_bot_data', self._panel_received_bot_data)
+            self.socket_io.on(f'{self.panel_token}_panel_received_username', self._panel_received_username)
         self.socket_io.on(f'all_panel_received_bot_data', self._panel_received_bot_data)
         self.socket_io.on(f'panel_received_server_heartbeat', self._panel_received_server_heartbeat)
 
@@ -38,11 +39,18 @@ class SocketIOClient(QObject):
             self.socket_io.connect(self.url, headers={'Authorization': f'###### {token}', 'Content-Type': 'application/json'}, namespaces=self.namespace)
             PattayaPanelUtil.panel_log_info("Panel has been connected to Pattaya server!")
             self.connected_to_server.emit()
+            if self.panel_token is None:
+                PattayaPanelUtil.panel_log_info("Initialized panel token! ...Listening bot_data and username event")
+                self.socket_io.on(f'{token}_panel_received_bot_data', self._panel_received_bot_data)
+                self.socket_io.on(f'{token}_panel_received_username', self._panel_received_username)
+                self.panel_token = token
+            else:
+                PattayaPanelUtil.panel_log_info("Found panel token! ...Listening bot_data and username event")
         except Exception as e:
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
         
-        self.socket_io.emit("panel_request_bot_data", {token: self.panel_token})
+        self.socket_io.emit("panel_request_bot_data", {"token": self.panel_token})
 
 
     def send_command(self, event, data):

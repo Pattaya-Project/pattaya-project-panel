@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt,QTimer,QSettings
 from PySide6.QtWidgets import QApplication, QDialog, QMainWindow,QMessageBox,QTableView,QMenu,QLabel,QWidget,QFileDialog
 from PySide6.QtGui import QIcon,QAction, QClipboard
 from core.info import PATTAYA_PANEL_VERSION
+from core.terminal_event import TerminalEvent
 from core.util import PattayaPanelUtil
 from designer.ui_main_window import Ui_MainWindow
 from model.bot_table_model import BotTableModel
@@ -21,16 +22,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.panel_username = "unknown"
         self.backup_title = self.windowTitle()
         self.old_title = self.windowTitle()
-        self.update_title = self.old_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(0)).replace('$PANEL_USER', self.panel_username)
+        self.online_bot_count = 0
+        self.update_title = self.old_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(self.online_bot_count)).replace('$PANEL_USER', self.panel_username)
         self.setWindowTitle(self.update_title)
         self.setMaximumSize(16777215, 16777215)
         self.settings = QSettings("unknownclub.net", "Pattaya")
         self.clipboard = QApplication.clipboard()
         if(self.settings.value("themes") is None):
-            self.settings.setValue("themes", 0)
+            self.settings.setValue("themes", 1)
         
         self.url = ""
         self.token = ""
+
+        self.terminal_event = TerminalEvent()
         
 
         self.about_dialog = AboutPattayaWidget()
@@ -141,12 +145,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.bot_table_view.setDisabled(True)
         else:
             self.bot_table_view.setDisabled(False)
-        self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(data)).replace('$PANEL_USER', self.panel_username)
+        self.online_bot_count = data
+        self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(self.online_bot_count)).replace('$PANEL_USER', self.panel_username)
         self.setWindowTitle(self.update_title)
 
     def update_username(self, data):
         self.panel_username = data
-        self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(data)).replace('$PANEL_USER', self.panel_username)
+        self.update_title = self.backup_title.replace('$VERSION', PATTAYA_PANEL_VERSION).replace('$ONLINE_BOT', str(self.online_bot_count)).replace('$PANEL_USER', self.panel_username)
         self.setWindowTitle(self.update_title)
 
 
@@ -181,7 +186,7 @@ HWID -> {item['hwid']}
         if PattayaPanelUtil.terminals.get(item['hwid']) is not None:
             return
         
-        terminal = BotTerminalWidget(item, self.url, self.token, "/")
+        terminal = BotTerminalWidget(item, self.url, self.token, "/", self.terminal_event)
         old_title = terminal.windowTitle()
         update_title = old_title.replace('$USERNAME', item['username']).replace('$LAN', item['lanIp']).replace('$WAN', item['wanIp']).replace('$INTEGR', item['integrity']).replace('$PN', item['processName'])
         terminal.setWindowTitle(update_title)
@@ -218,6 +223,7 @@ HWID -> {item['hwid']}
 
 
     def stop(self):
+        self.terminal_event.close_terminal()
         self.socket_io_client.stop()
         self.bots_table_model.refresh([])
     
@@ -253,6 +259,8 @@ HWID -> {item['hwid']}
             "Pattaya server setting",
             "Setting Saved!",
             QMessageBox.Ok)
+            self.socket_io_client.panel_token = None
+            self.restart_server()
         else:
             PattayaPanelUtil.panel_log_error(f'Ignore Pattaya server configuration')
         
@@ -282,7 +290,13 @@ HWID -> {item['hwid']}
         
 
     def closeEvent(self, event):
-        terminals = PattayaPanelUtil.terminals.values()
-        for terminal in terminals:
-            terminal.socket_io_client.stop()
-            terminal.close()
+        self.stop()
+
+
+    def restart_server(self):
+        self.stop()
+        self.start()
+    
+
+    def clear_all_terminal(self):
+        pass
