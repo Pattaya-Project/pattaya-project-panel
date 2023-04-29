@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QUrl,Qt
 from designer.ui_about_pattaya import Ui_AboutPattayaWidget
 from PySide6.QtMultimedia import QMediaPlayer,QAudioOutput
 
@@ -15,6 +15,7 @@ class AboutPattayaWidget(QWidget, Ui_AboutPattayaWidget):
         self.audio.setVolume(0.5)
 
         self.player.setAudioOutput(self.audio)
+        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
 
     def closeEvent(self, event):
         self.player.stop()

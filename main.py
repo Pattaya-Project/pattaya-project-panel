@@ -25,6 +25,9 @@ match settings.value("themes"):
         qdarktheme.setup_theme(custom_colors={"primary": "#FB00FF"})
     case 1:
         qdarktheme.setup_theme(theme="light",custom_colors={"primary": "#FB00FF"})
+    case _:
+        qdarktheme.setup_theme(theme="light",custom_colors={"primary": "#FB00FF"})
+    
 
 del settings
 
