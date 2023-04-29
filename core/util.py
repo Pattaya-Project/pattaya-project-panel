@@ -76,7 +76,7 @@ class PattayaPanelUtil:
  |_|   \__,_|\__|\__\__,_|\__, |\__,_| |_|  \_\/_/    \_\_|   
                            __/ |                              
                           |___/                               
-                                Welcome {username} Pattaya Terminal :)
+                                Welcome {username} to Pattaya Terminal :)
 
     Your allow command is {allow_command}
         """
