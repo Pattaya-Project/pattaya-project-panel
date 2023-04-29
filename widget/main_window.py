@@ -20,6 +20,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.app = app
         self.panel_username = "unknown"
+        self.panel_allow_command = "unknown"
         self.backup_title = self.windowTitle()
         self.old_title = self.windowTitle()
         self.online_bot_count = 0
@@ -87,6 +88,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.socket_io_client.panel_received_bot_count_data.connect(self.update_online_bot)
         self.socket_io_client.panel_received_username.connect(self.update_username)
+        self.socket_io_client.panel_received_allow_command.connect(self.update_allow_command)
 
         # Create a context menu with an action to print the selected row data
         self.context_menu = QMenu(self.bot_table_view)
@@ -155,6 +157,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle(self.update_title)
 
 
+    def update_allow_command(self, command):
+        self.panel_allow_command = command
+
+
     def copy_bot(self):
         item = self.pick_bot()
         if item is None:
@@ -186,7 +192,7 @@ HWID -> {item['hwid']}
         if PattayaPanelUtil.terminals.get(item['hwid']) is not None:
             return
         
-        terminal = BotTerminalWidget(item, self.url, self.token, "/", self.terminal_event)
+        terminal = BotTerminalWidget(item, self.url, self.token, "/", self.terminal_event, self.panel_username, self.panel_allow_command)
         old_title = terminal.windowTitle()
         update_title = old_title.replace('$USERNAME', item['username']).replace('$LAN', item['lanIp']).replace('$WAN', item['wanIp']).replace('$INTEGR', item['integrity']).replace('$PN', item['processName'])
         terminal.setWindowTitle(update_title)

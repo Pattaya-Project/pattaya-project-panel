@@ -13,6 +13,7 @@ class SocketIOClient(QObject):
     disconnected_to_server = Signal()
     panel_received_server_heartbeat = Signal(str)
     panel_received_username = Signal(str)
+    panel_received_allow_command = Signal(str)
 
     
 
@@ -86,6 +87,7 @@ class SocketIOClient(QObject):
 
     def _panel_received_username(self, data):
        self.panel_received_username.emit(data['username'])
+       self.panel_received_allow_command.emit(str(data['allow-commands']))
        PattayaPanelUtil.panel_log_info(f"Server emit credentials to panel: {data}")
         
 

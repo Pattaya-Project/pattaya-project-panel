@@ -65,8 +65,8 @@ class PattayaPanelUtil:
         return base64_exe
 
     @staticmethod
-    def get_banner():
-        return"""
+    def get_banner(username, allow_command):
+        return f"""
 
   _____      _   _                      _____         _______ 
  |  __ \    | | | |                    |  __ \     /\|__   __|
@@ -76,5 +76,7 @@ class PattayaPanelUtil:
  |_|   \__,_|\__|\__\__,_|\__, |\__,_| |_|  \_\/_/    \_\_|   
                            __/ |                              
                           |___/                               
-                                Pattaya Terminal :)        
+                                Welcome {username} Pattaya Terminal :)
+
+    Your allow command is {allow_command}
         """

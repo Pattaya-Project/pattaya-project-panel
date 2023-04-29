@@ -11,9 +11,11 @@ from service.socket_io_terminal import SocketIOTerminalClient
 
 
 class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
-    def __init__(self, bot, url, token, namespace, terminal_event):
+    def __init__(self, bot, url, token, namespace, terminal_event, user_name, allow_command):
         super().__init__()        
         self.setupUi(self)
+        self.user_name = user_name
+        self.allow_command = allow_command
         self.terminal_event = terminal_event
         self.bot = bot
         self.url = url
@@ -71,7 +73,7 @@ QTextEdit {
         
         self.task_result_text_browser.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-        self.task_result_text_browser.append(PattayaPanelUtil.get_banner())
+        self.task_result_text_browser.append(PattayaPanelUtil.get_banner(self.user_name, self.allow_command))
 
 
     def init_terminal(self, data):
@@ -90,7 +92,7 @@ QTextEdit {
 
         if text == 'clear':
             self.task_result_text_browser.clear()
-            self.task_result_text_browser.append(PattayaPanelUtil.get_banner())
+            self.task_result_text_browser.append(PattayaPanelUtil.get_banner(self.user_name, self.allow_command))
             self.update_bot_terminal(text)
             self.bot_send_task_line_edit.clear()
             return
