@@ -61,7 +61,7 @@ class Ui_BotTerminalWidget(object):
     # setupUi
 
     def retranslateUi(self, BotTerminalWidget):
-        BotTerminalWidget.setWindowTitle(QCoreApplication.translate("BotTerminalWidget", u"[ Terminal ] - [ Username: $USERNAME ] / LAN IP: $LAN / WAN IP: $WAN / Integrity: $INTEGR / ProcessName: $PN", None))
+        BotTerminalWidget.setWindowTitle(QCoreApplication.translate("BotTerminalWidget", u"[ Terminal ] - [Username: $USERNAME] || [LAN IP: $LAN] || [WAN IP: $WAN] || [Integrity: $INTEGR] || [Process: $PN]", None))
         self.mark_bar_label.setText(QCoreApplication.translate("BotTerminalWidget", u">>>", None))
     # retranslateUi
 

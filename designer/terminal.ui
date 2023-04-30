@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>[ Terminal ] - [ Username: $USERNAME ] / LAN IP: $LAN / WAN IP: $WAN / Integrity: $INTEGR / ProcessName: $PN</string>
+   <string>[ Terminal ] - [Username: $USERNAME] || [LAN IP: $LAN] || [WAN IP: $WAN] || [Integrity: $INTEGR] || [Process: $PN]</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
