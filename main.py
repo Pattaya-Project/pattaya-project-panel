@@ -1,4 +1,5 @@
 import sys
+import os
 
 from PySide6 import QtWidgets
 from core.util import PattayaPanelUtil
@@ -14,7 +15,7 @@ import winerror
 def on_exit():
     del PattayaPanelUtil.terminals
     socket_io_client.stop()
-    #print("Exiting the application...")
+    os._exit(0)
 
 
 app = QtWidgets.QApplication(sys.argv)
@@ -42,14 +43,14 @@ if not mutex:
     "Pattaya Panel Alert",
     "Cannot create Mutex",
     QtWidgets.QMessageBox.Ok)
-    sys.exit(0)
+    os._exit(0)
 
 if win32api.GetLastError() == winerror.ERROR_ALREADY_EXISTS:
     QtWidgets.QMessageBox.warning(window, 
     "Pattaya Panel Alert",
     "One Instance only",
     QtWidgets.QMessageBox.Ok)
-    sys.exit(0)
+    os._exit(0)
 window.show()
 app.exec()
 

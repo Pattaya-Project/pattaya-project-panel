@@ -39,6 +39,7 @@ class SocketIOTerminalClient(QObject):
         try:
             self.socket_io.connect(self.url, headers={'Authorization': f'###### {self.token}', 'Content-Type': 'application/json'}, namespaces=self.namespace)
         except Exception as e:
+            self.socket_io.disconnect()
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
 
@@ -46,6 +47,8 @@ class SocketIOTerminalClient(QObject):
         try:
             self.socket_io.emit(event, data)
         except Exception as e:
+            self.server_ack_bot_discon.emit()
+            self.socket_io.disconnect()
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
     def stop(self):

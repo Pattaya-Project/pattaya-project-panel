@@ -47,11 +47,13 @@ class SocketIOClient(QObject):
                 self.panel_token = token
             else:
                 PattayaPanelUtil.panel_log_info("Found panel token! ...Listening bot_data and username event")
+            
+            self.socket_io.emit("panel_request_bot_data", {"token": self.panel_token})
         except Exception as e:
             PattayaPanelUtil.panel_log_error(f'{str(e)}')
 
         
-        self.socket_io.emit("panel_request_bot_data", {"token": self.panel_token})
+        
 
 
     def send_command(self, event, data):
