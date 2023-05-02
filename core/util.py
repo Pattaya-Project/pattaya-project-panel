@@ -49,6 +49,7 @@ class PattayaPanelUtil:
         table.rows.append(["whoami", "Get current username"])
         table.rows.append(["shell", "Execute shell command"])
         table.rows.append(["upload", "Upload file to bot (limit file size to 10MB)"])
+        table.rows.append(["download", "Download file from bot (limit file size to 10MB)"])
         table.rows.append(["execute-assembly", "Execute .Net assembly"])
         table.rows.append(["clear", "Clear terminal"])
         
@@ -64,6 +65,10 @@ class PattayaPanelUtil:
         base64_bytes = base64.b64encode(exe_bytes)
         base64_exe = base64_bytes.decode('utf-8')
         return base64_exe
+    
+    @staticmethod
+    def base64_file_decode(base64string):
+        return base64.b64decode(base64string)
 
     @staticmethod
     def get_banner(username, allow_command):

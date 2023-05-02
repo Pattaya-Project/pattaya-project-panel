@@ -12,6 +12,7 @@ class SocketIOTerminalClient(QObject):
     server_ack_result = Signal(str)
     server_ack_bot_discon = Signal()
     server_ack_bot_not_allow_command = Signal(str)
+    server_ack_response_file = Signal(str, str)
 
     def __init__(self, bot):
         super().__init__()
@@ -22,6 +23,7 @@ class SocketIOTerminalClient(QObject):
         self.bot_event_not_allow_command = f'{self.panel_token}_server_ack_not_allow_terminal_bot_task_result_{self.bot["hwid"]}'
         self.bot_event_result = f'{self.panel_token}_panel_terminal_bot_task_result_{self.bot["hwid"]}'
         self.bot_event_bot_discon = f'panel_terminal_bot_seem_disconnected_{self.bot["socketId"]}'
+        self.bot_event_ack_response_file = f'{self.panel_token}_server_ack_response_file_{self.bot["hwid"]}'
 
         self.socket_io = socketio.Client()
         self.socket_io.on('connect', self._on_connect)
@@ -30,6 +32,8 @@ class SocketIOTerminalClient(QObject):
         self.socket_io.on(self.bot_event_result, self._on_server_ack_result)
         self.socket_io.on(self.bot_event_bot_discon, self._on_server_ack_bot_discon)
         self.socket_io.on(self.bot_event_not_allow_command, self._on_bot_event_not_allow_command)
+        self.socket_io.on(self.bot_event_ack_response_file, self._handle_file)
+
 
 
     def start(self, url, token, namespace):
@@ -83,4 +87,9 @@ class SocketIOTerminalClient(QObject):
     def _on_bot_event_not_allow_command(self, data):
        self.server_ack_bot_not_allow_command.emit(data['message'])
        PattayaPanelUtil.panel_log_info(f"This panel not allow using current command")
+
+
+    def _handle_file(self, data):
+        self.server_ack_response_file.emit(data['respondingFile'], data['respondingFilename'])
+        PattayaPanelUtil.panel_log_info(f"Panel received file")
 
