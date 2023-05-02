@@ -54,6 +54,7 @@ class PattayaPanelUtil:
         table.rows.append(["download", "Download file from bot (limit file size to 10MB)"])
         table.rows.append(["execute-assembly", "Execute .Net assembly"])
         table.rows.append(["screenshot", "Capture bot screen"])
+        table.rows.append(["openloots", "Open bot loots collection"])
         table.rows.append(["clear", "Clear terminal"])
         
         table.columns.header = ["Command", "Description"]

