@@ -44,6 +44,8 @@ class PattayaPanelUtil:
         table.rows.append(["mkdir", "Create directory"])
         table.rows.append(["rmdir", "Delete directory"])
         table.rows.append(["ls", "List directory"])
+        table.rows.append(["cat", "View file content"])
+        table.rows.append(["rm", "Delete file"])
         table.rows.append(["ps", "List all processes"])
         table.rows.append(["pwd", "Print current working directory"])
         table.rows.append(["whoami", "Get current username"])
