@@ -51,6 +51,12 @@ if win32api.GetLastError() == winerror.ERROR_ALREADY_EXISTS:
     "One Instance only",
     QtWidgets.QMessageBox.Ok)
     os._exit(0)
+
+loot_directory = "loots"
+
+if not os.path.exists(loot_directory):
+    os.makedirs(loot_directory)
+
 window.show()
 app.exec()
 

