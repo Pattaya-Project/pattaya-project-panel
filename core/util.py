@@ -48,6 +48,7 @@ class PattayaPanelUtil:
         table.rows.append(["pwd", "Print current working directory"])
         table.rows.append(["whoami", "Get current username"])
         table.rows.append(["shell", "Execute shell command"])
+        table.rows.append(["upload", "Upload file to bot (limit file size to 10MB)"])
         table.rows.append(["execute-assembly", "Execute .Net assembly"])
         table.rows.append(["clear", "Clear terminal"])
         

