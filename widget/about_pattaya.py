@@ -19,6 +19,7 @@ class AboutPattayaWidget(QWidget, Ui_AboutPattayaWidget):
 
     def closeEvent(self, event):
         self.player.stop()
+        event.accept()
 
     def play_sound(self):
         self.player.play()

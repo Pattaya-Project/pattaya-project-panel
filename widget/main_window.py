@@ -297,6 +297,7 @@ HWID -> {item['hwid']}
 
     def closeEvent(self, event):
         self.stop()
+        event.accept()
 
 
     def restart_server(self):
