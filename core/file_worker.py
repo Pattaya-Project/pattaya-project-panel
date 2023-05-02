@@ -11,15 +11,22 @@ class FileDownloadWorker(QObject):
     file = ''
     filename = ''
     path = ''
+    screenshot_path = ''
 
-    def setup_data(self, file, filename, path):
+    def setup_data(self, file, filename, path, screenshot_path):
         self.file = file
         self.filename = filename
         self.path = path
+        self.screenshot_path = screenshot_path
 
     
     def doWorkDownload(self):
-        file_path = os.path.join(self.path, self.filename)
+        path = ''
+        if "screen_" in self.filename:
+            path = self.screenshot_path
+        else:
+            path = self.path
+        file_path = os.path.join(path, self.filename)
         decoded_bytes = PattayaPanelUtil.base64_file_decode(self.file)
         with io.open(file_path, 'wb') as f:
             f.write(decoded_bytes)
