@@ -40,6 +40,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.about_dialog = AboutPattayaWidget()
         self.about_dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+        self.panel_log_text_browser.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        
+        self.server_log_text_browser.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         
         PattayaPanelUtil.setup(self.panel_log_text_browser, self.server_log_text_browser)
         self.socket_io_client = socket_io_client
