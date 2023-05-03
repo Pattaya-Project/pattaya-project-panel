@@ -179,6 +179,8 @@ INTEGRITY -> {item['integrity']}
 COUNTRY -> {item['country']}
 LAST SEEN -> {item['lastSeen']}
 HWID -> {item['hwid']}
+TYPE -> {item['type']}
+VERSION -> {item['version']}
         """)
 
         PattayaPanelUtil.panel_log_info(f"Bot username: {item['username']} was copied")

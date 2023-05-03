@@ -7,7 +7,7 @@ class BotTableModel(QAbstractTableModel):
         super().__init__(parent)
         self.internal_data = []
         self._socket_io_client = socket_io_client
-        self._header = ["id", "socketId", "wanIp", "lanIp", "os", "username", "hostname", "processName", "processId", "architecture", "integrity", "country", "lastSeen", "hwid"]
+        self._header = ["id", "socketId", "wanIp", "lanIp", "os", "username", "hostname", "processName", "processId", "architecture", "integrity", "country", "lastSeen", "hwid", "type" , "version"]
 
         self._socket_io_client.panel_received_bot_data.connect(self.refresh)
 
@@ -59,6 +59,8 @@ class BotTableModel(QAbstractTableModel):
                 if(section == 11) : return "COUNTRY"
                 if(section == 12) : return "LAST SEEN"
                 if(section == 13) : return "HWID"
+                if(section == 14) : return "TYPE"
+                if(section == 15) : return "VERSION"
         # return super().headerData(section, orientation, role)
     
     def refresh(self, data):
