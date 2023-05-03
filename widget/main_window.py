@@ -167,6 +167,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
         self.clipboard.setText(f"""
 Socket ID -> {item['socketId']}
+TAG -> {item['tag']}
 WAN IP -> {item['wanIp']}
 LAN IP -> {item['lanIp']}
 OS -> {item['os']}
@@ -196,7 +197,7 @@ VERSION -> {item['version']}
         
         terminal = BotTerminalWidget(item, self.url, self.token, "/", self.terminal_event, self.panel_username, self.panel_allow_command)
         old_title = terminal.windowTitle()
-        update_title = old_title.replace('$USERNAME', item['username']).replace('$LAN', item['lanIp']).replace('$WAN', item['wanIp']).replace('$INTEGR', item['integrity']).replace('$PN', f"{item['processName']}.exe")
+        update_title = old_title.replace('$USERNAME', item['username']).replace('$LAN', item['lanIp']).replace('$WAN', item['wanIp']).replace('$INTEGR', item['integrity']).replace('$PN', item['processName'])
         terminal.setWindowTitle(update_title)
         PattayaPanelUtil.terminals[item['hwid']] = terminal
         (PattayaPanelUtil.terminals[item['hwid']]).show()

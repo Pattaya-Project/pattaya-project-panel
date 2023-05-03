@@ -61,8 +61,7 @@ QTextBrowser {
 
         self.socket_io_client.start(self.url, self.token, self.namespace)
 
-
-        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'openloots', 'mkdir', 'rmdir', 'ls', 'rm', 'pwd', 'ps', 'whoami', 'shell', 'execute-assembly','upload','download', 'screenshot', 'cat', 'clear']
+        self.commands = ['help', 'pingbot', 'killbot', 'cd', 'openloots', 'mkdir', 'rmdir', 'ls', 'rm', 'pwd', 'ps', 'whoami', 'shell', 'url-download', 'execute-assembly','upload','download', 'screenshot', 'cat', 'clear']
         self.completer = QCompleter( self.commands, self.bot_send_task_line_edit)
         self.completer.setCompletionMode(QCompleter.InlineCompletion)
 

@@ -7,7 +7,7 @@ class BotTableModel(QAbstractTableModel):
         super().__init__(parent)
         self.internal_data = []
         self._socket_io_client = socket_io_client
-        self._header = ["id", "socketId", "wanIp", "lanIp", "os", "username", "hostname", "processName", "processId", "architecture", "integrity", "country", "lastSeen", "hwid", "type" , "version"]
+        self._header = ["id", "tag", "socketId", "wanIp", "lanIp", "os", "username", "hostname", "processName", "processId", "architecture", "integrity", "country", "lastSeen", "hwid", "type" , "version"]
 
         self._socket_io_client.panel_received_bot_data.connect(self.refresh)
 
@@ -25,7 +25,7 @@ class BotTableModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
             if col == 0:
                 return str(row)
-            if col == 12:
+            if col == 13:
                 iso_date_string = str(self.internal_data[row][self._header[col]])
                 iso_date = datetime.datetime.fromisoformat(iso_date_string)
                 iso_date = iso_date + datetime.timedelta(hours=7)
@@ -33,7 +33,7 @@ class BotTableModel(QAbstractTableModel):
                 return new_format
             return str(self.internal_data[row][self._header[col]])
                 #Target th favorite color column
-        elif ((role == Qt.DecorationRole) and (index.column() == 11)) :
+        elif ((role == Qt.DecorationRole) and (index.column() == 12)) :
             flag = QIcon()
             try:
                 flag = QIcon(f":/flags/assets/flags/{str(self.internal_data[row][self._header[col]]).lower()}.png")
@@ -46,21 +46,22 @@ class BotTableModel(QAbstractTableModel):
         if( role == Qt.DisplayRole):
             if(orientation == Qt.Horizontal):
                 if(section == 0) : return "ID"
-                if(section == 1) : return "Socket ID"
-                if(section == 2) : return "WAN IP"
-                if(section == 3) : return "LAN IP"
-                if(section == 4) : return "OS"
-                if(section == 5) : return "USERNAME"
-                if(section == 6) : return "HOSTNAME"
-                if(section == 7) : return "PROCESS NAME"
-                if(section == 8) : return "PROCESS ID"
-                if(section == 9) : return "ARCHITECTURE"
-                if(section == 10) : return "INTEGRITY"
-                if(section == 11) : return "COUNTRY"
-                if(section == 12) : return "LAST SEEN"
-                if(section == 13) : return "HWID"
-                if(section == 14) : return "TYPE"
-                if(section == 15) : return "VERSION"
+                if(section == 1) : return "TAG"
+                if(section == 2) : return "Socket ID"
+                if(section == 3) : return "WAN IP"
+                if(section == 4) : return "LAN IP"
+                if(section == 5) : return "OS"
+                if(section == 6) : return "USERNAME"
+                if(section == 7) : return "HOSTNAME"
+                if(section == 8) : return "PROCESS NAME"
+                if(section == 9) : return "PROCESS ID"
+                if(section == 10) : return "ARCHITECTURE"
+                if(section == 11) : return "INTEGRITY"
+                if(section == 12) : return "COUNTRY"
+                if(section == 13) : return "LAST SEEN"
+                if(section == 14) : return "HWID"
+                if(section == 15) : return "TYPE"
+                if(section == 16) : return "VERSION"
         # return super().headerData(section, orientation, role)
     
     def refresh(self, data):
